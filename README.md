@@ -1,2 +1,2 @@
-# AOVI
+# AV
 Auralization of visual information
