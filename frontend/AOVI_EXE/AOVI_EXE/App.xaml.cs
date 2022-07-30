@@ -28,7 +28,7 @@ namespace AOVI_EXE
             }
         }
 
-        void DataReceive()
+        private static void DataReceive()
         {
 
         }
