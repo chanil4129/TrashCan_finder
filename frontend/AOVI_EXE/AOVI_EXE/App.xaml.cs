@@ -19,11 +19,18 @@ namespace AOVI_EXE
             try
             {
                 DispatcherHelper.Initialize();
+
+                DataReceive();
             }
             catch(Exception ex)
             {
 
             }
+        }
+
+        void DataReceive()
+        {
+
         }
     }
 }
