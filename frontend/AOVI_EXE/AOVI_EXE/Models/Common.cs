@@ -18,40 +18,41 @@ namespace AOVI_EXE.Models
         List<string> P_Address = new List<string>();
         public void DataReceived2()     //object sender, System.Windows.Forms.WebBrowserDocumentCompletedEventArgs e
         {
-            try
-            {
-                //string path = HttpContext.Current.Request.Url.Host;
-            }
-            catch (Exception ex)
-            {
-
-            }
-            string url = "https://www.hani.co.kr/arti/politics/politics_general/1052888.html?_ns=t1";
+            Global.WebUrl();
+            
+            Global.url = "https://www.hani.co.kr/arti/politics/politics_general/1052888.html?_ns=t1";
             WebClient client = new WebClient();
             client.Encoding = Encoding.UTF8;
-            string htmlstr = client.DownloadString(url);
+            string htmlstr = client.DownloadString(Global.url);
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(htmlstr);
             HtmlNode bodynode = doc.DocumentNode.SelectSingleNode("//body");
 
 
-            foreach (HtmlNode aNode in bodynode.SelectNodes("//a | //img | //td | //p"))
+            foreach (HtmlNode aNode in bodynode.SelectNodes("//a | //img | //td | //p | //li"))
             {
                 string textData = string.Empty;
                 string linkData = string.Empty;
                 if (aNode.Name == "a")
                 {
                     textData = aNode.InnerText;
-                    //linkData = aNode.Attributes["href"].Value;
+                    linkData = aNode.GetAttributeValue("href", "");
                 }
                 else if (aNode.Name == "img")
                 {
                     linkData = aNode.Attributes["src"].Value;
 
                     string fileName = @"C:\Image\a.png";
-                    if (DownloadRemoteImageFile(linkData, fileName))
+                    try
                     {
-                        SendData(fileName);
+                        if (DownloadRemoteImageFile(linkData, fileName))
+                        {
+                            SendData(fileName);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
                     }
                 }
                 else if (aNode.Name == "td")
