@@ -1,6 +1,7 @@
 ﻿using AOVI_EXE.Models;
 using AOVI_EXE.ViewModel;
 using System;
+using System.Speech.Synthesis;
 using System.Web;
 using System.Windows;
 using System.Windows.Input;
@@ -41,21 +42,31 @@ namespace AOVI_EXE
             {
                 if (e.Key.ToString() == "Right")
                 {
-                    Common com = new Common();
-                    com.DataReceived2();
+
+                    SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
+
+                    speechSynthesizer.SetOutputToDefaultAudioDevice();
+
+                    speechSynthesizer.SelectVoice("Microsoft Heami Desktop");
+
+                    speechSynthesizer.Speak("");
                 }
                 if (e.Key.ToString() == "Left")
                 {
 
                 }
-                if (e.Key.ToString() == "Up")
+                if (e.Key.ToString() == "F10")
                 {
+                    try
+                    {
 
-                }
-                if (e.Key.ToString() == "Down")
-                {
+                    }
+                    catch(Exception ex)
+                    {
 
+                    }
                 }
+
             }
             catch (Exception ex)
             {

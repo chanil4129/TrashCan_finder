@@ -1,4 +1,7 @@
-﻿using GalaSoft.MvvmLight.Threading;
+﻿using AOVI_EXE.Models;
+using GalaSoft.MvvmLight.Threading;
+using OpenQA.Selenium;
+using OpenQA.Selenium.IE;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -23,7 +26,15 @@ namespace AOVI_EXE
         {
             try
             {
-                DispatcherHelper.Initialize();
+                //DispatcherHelper.Initialize();
+
+                //using (IWebDriver driver = new InternetExplorerDriver())
+                //{
+                //    driver.Url = "https://www.naver.com/";
+                //}
+
+                Common com = new Common();
+                com.DataReceived();
             }
             catch(Exception ex)
             {

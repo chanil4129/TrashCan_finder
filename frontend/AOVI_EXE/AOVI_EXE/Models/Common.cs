@@ -1,10 +1,13 @@
 ﻿using AOVI_EXE.Models.Parsing;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Speech.Synthesis;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -16,9 +19,8 @@ namespace AOVI_EXE.Models
         System.Net.WebClient wc = new System.Net.WebClient();
         List<string> P_data = new List<string>();
         List<string> P_Address = new List<string>();
-        public void DataReceived2()     //object sender, System.Windows.Forms.WebBrowserDocumentCompletedEventArgs e
+        public void DataReceived()     //object sender, System.Windows.Forms.WebBrowserDocumentCompletedEventArgs e
         {
-            Global.WebUrl();
             
             Global.url = "https://www.hani.co.kr/arti/politics/politics_general/1052888.html?_ns=t1";
             WebClient client = new WebClient();
@@ -48,6 +50,7 @@ namespace AOVI_EXE.Models
                         if (DownloadRemoteImageFile(linkData, fileName))
                         {
                             SendData(fileName);
+                            ReceivedData();
                         }
                     }
                     catch (Exception ex)
@@ -63,6 +66,7 @@ namespace AOVI_EXE.Models
                 P_data.Add(textData);
                 P_Address.Add(linkData);
             }
+
         }
 
         private bool DownloadRemoteImageFile(string url, string fileName)
@@ -100,6 +104,46 @@ namespace AOVI_EXE.Models
             return false;
         }
 
+        private void ReceivedData()
+        {
+            string response = string.Empty;
+            var url = "http://52.79.202.39/?REQ=api_KAKAO_OCR";
+
+            try
+            {
+                var webRequest = (HttpWebRequest)WebRequest.Create(url);
+                webRequest.ContentType = "application/json";
+                webRequest.Accept = "application/json";
+                webRequest.Method = "POST";
+                using (var streamWriter = new StreamWriter(webRequest.GetRequestStream()))
+                {
+                    JObject job = new JObject();
+                    streamWriter.Write(job);
+                    streamWriter.Flush();
+                    streamWriter.Close();
+
+                    job = null;
+
+                    var httpResponse = (HttpWebResponse)webRequest.GetResponse();
+                    using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                    {
+                        response = streamReader.ReadToEnd();
+                    }
+                }
+
+                var takeInfo = JsonConvert.DeserializeObject<dynamic>(response);
+            }
+            catch(Exception ex) 
+            {
+                
+            }
+        }
+
+
+        /// <summary>
+        /// Image Send
+        /// </summary>
+        /// <param name="path"></param>
         private void SendData(string path)
         {
             string boundary = "**boundaryline**";
@@ -142,6 +186,12 @@ namespace AOVI_EXE.Models
             }
         }
 
+        /// <summary>
+        /// Image Boundary화
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="boundary"></param>
+        /// <returns></returns>
         private static byte[] ReadFileToBoundary(string filepath, string boundary)
         {
             var boundarybytes = Encoding.ASCII.GetBytes($"\r\n--{boundary}\r\n");

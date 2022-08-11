@@ -5,13 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AOVI_EXE"
         mc:Ignorable="d"
-        Height="1080" Width="1920"
+        Height="0" Width="0"
         WindowStyle="None"
         ResizeMode="NoResize"
         Background="{x:Null}"
         DataContext="{Binding Main, Source={StaticResource Locator}}">
     <Viewbox x:Name="LayoutRoot" Stretch="Fill">
-        <Grid Width="1920" Height="1080" Background="{x:Null}">
+        <Grid Width="1" Height="1" Background="{x:Null}">
             <ContentControl x:Name="ModelPage" Content="{Binding CurrentViewModel}"/>
         </Grid>
     </Viewbox>
