@@ -1,6 +1,9 @@
 ﻿using AOVI_EXE.Models;
+using AOVI_EXE.Models.Parsing;
 using AOVI_EXE.ViewModel;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Speech.Synthesis;
 using System.Web;
 using System.Windows;
@@ -15,10 +18,10 @@ namespace AOVI_EXE
     public partial class MainWindow : Window
     {
         System.Windows.Threading.DispatcherTimer timer = new System.Windows.Threading.DispatcherTimer();
+        SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
         public MainWindow()
         {
             InitializeComponent();
-
             Closing += (s, e) => ViewModelLocator.Cleanup();
             MainWindow window = App.Current.MainWindow as MainWindow;
 
@@ -29,44 +32,53 @@ namespace AOVI_EXE
 
             this.KeyDown += MainVeiw_KeyDown;
 
-            timer.Stop();
-            timer.Interval = TimeSpan.FromSeconds(300);
-            timer.Tick += new System.EventHandler(timer_Tick);
-            timer.Start();
-            timer_Tick(null, null);
+            //timer.Stop();
+            //timer.Interval = TimeSpan.FromSeconds(300);
+            //timer.Tick += new System.EventHandler(timer_Tick);
+            //timer.Start();
+            //timer_Tick(null, null);
         }
 
         void MainVeiw_KeyDown(object sender, KeyEventArgs e)
         {
             try
             {
-                if (e.Key.ToString() == "Right")
-                {
 
-                    SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
-
-                    speechSynthesizer.SetOutputToDefaultAudioDevice();
-
-                    speechSynthesizer.SelectVoice("Microsoft Heami Desktop");
-
-                    speechSynthesizer.Speak("");
-                }
-                if (e.Key.ToString() == "Left")
-                {
-
-                }
                 if (e.Key.ToString() == "F10")
                 {
                     try
                     {
 
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
 
                     }
                 }
+                else
+                {
+                    string text = Global.ReceivedData[Global.Textorder].divtd;
+                    string link = Global.ReceivedData[Global.Linkorder].ahref;
 
+                    speechSynthesizer.SetOutputToDefaultAudioDevice();
+
+                    speechSynthesizer.SelectVoice("Microsoft Heami Desktop");
+                    if (e.Key.ToString() == "Right")
+                    {
+                        Global.Textorder++;
+                        Global.Linkorder++;
+                        speechSynthesizer.Speak(text);
+                    }
+                    if (e.Key.ToString() == "Left")
+                    {
+                        if (Global.Textorder > 0)
+                        {
+                            Global.Textorder--;
+                            Global.Linkorder--;
+                        }
+
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -75,7 +87,7 @@ namespace AOVI_EXE
         }
         private void timer_Tick(object sender, System.EventArgs e)
         {
-        }
 
+        }
     }
 }

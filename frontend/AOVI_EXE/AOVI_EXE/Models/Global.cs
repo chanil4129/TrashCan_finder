@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using AOVI_EXE.Models.Parsing;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.IE;
 using System;
@@ -13,9 +14,10 @@ namespace AOVI_EXE.Models
 {
     public class Global
     {
-        public static int Linkorder { get; set; }               //홈페이지 링크 데이터를 담은 List를 순서대로 부를때 쓰는 변수
+        public static int Linkorder { get; set; } = 0;               //홈페이지 링크 데이터를 담은 List를 순서대로 부를때 쓰는 변수
         public static string url { get; set; } = "";            //홈페이지 url주소 담아두는 변수
-        public static int Textorder { get; set; }               //홈페이지 텍스트 테이터를 담은 List를 순서대로 부를때 쓰는 변수>
+        public static int Textorder { get; set; } = 0;               //홈페이지 텍스트 테이터를 담은 List를 순서대로 부를때 쓰는 변수>
+        public static List<ParsingModel> ReceivedData = new List<ParsingModel>();
         public IWebDriver serverDriver;
 
         /// <summary>

@@ -17,8 +17,9 @@ namespace AOVI_EXE.Models
     public class Common
     {
         System.Net.WebClient wc = new System.Net.WebClient();
-        List<string> P_data = new List<string>();
-        List<string> P_Address = new List<string>();
+        //List<string> P_data = new List<string>();
+        //List<string> P_Address = new List<string>();
+        List<ParsingModel> P_Parsing = new List<ParsingModel>();
         public void DataReceived()     //object sender, System.Windows.Forms.WebBrowserDocumentCompletedEventArgs e
         {
             
@@ -33,40 +34,35 @@ namespace AOVI_EXE.Models
 
             foreach (HtmlNode aNode in bodynode.SelectNodes("//a | //img | //td | //p | //li"))
             {
-                string textData = string.Empty;
-                string linkData = string.Empty;
+                ParsingModel parsingText = new ParsingModel();
                 if (aNode.Name == "a")
                 {
-                    textData = aNode.InnerText;
-                    linkData = aNode.GetAttributeValue("href", "");
+                    parsingText.divtd = aNode.InnerText;
+                    parsingText.ahref = aNode.GetAttributeValue("href", "");
                 }
                 else if (aNode.Name == "img")
                 {
-                    linkData = aNode.Attributes["src"].Value;
+                    parsingText.ahref = aNode.Attributes["src"].Value;
 
                     string fileName = @"C:\Image\a.png";
                     try
                     {
-                        if (DownloadRemoteImageFile(linkData, fileName))
-                        {
-                            SendData(fileName);
-                            ReceivedData();
-                        }
+                        //if (DownloadRemoteImageFile(parsingText.ahref, fileName))
+                        //{
+                        //    SendData(fileName);
+                        //    ReceivedData();
+                        //}
                     }
                     catch (Exception ex)
                     {
 
                     }
                 }
-                else if (aNode.Name == "td")
-                    textData = aNode.InnerText;
                 else
-                    textData = aNode.InnerText;
-
-                P_data.Add(textData);
-                P_Address.Add(linkData);
+                    parsingText.divtd = aNode.InnerText;
+                P_Parsing.Add(parsingText);
             }
-
+            Global.ReceivedData = P_Parsing;
         }
 
         private bool DownloadRemoteImageFile(string url, string fileName)

@@ -10,6 +10,5 @@ namespace AOVI_EXE.Models.Parsing
     {
         public string ahref { get; set; }           //버튼데이터
         public string divtd { get; set; }           //일반텍스트
-        public string imageText { get; set; }       //이미지텍스트
     }
 }
