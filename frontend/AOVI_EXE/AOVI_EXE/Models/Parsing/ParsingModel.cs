@@ -10,5 +10,6 @@ namespace AOVI_EXE.Models.Parsing
     {
         public string ahref { get; set; }           //버튼데이터
         public string divtd { get; set; }           //일반텍스트
+        public bool imgcheck { get; set; }          //이미지인지 확인
     }
 }

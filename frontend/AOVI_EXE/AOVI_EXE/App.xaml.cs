@@ -26,7 +26,7 @@ namespace AOVI_EXE
         {
             try
             {
-                //DispatcherHelper.Initialize();
+                DispatcherHelper.Initialize();
 
                 //using (IWebDriver driver = new InternetExplorerDriver())
                 //{

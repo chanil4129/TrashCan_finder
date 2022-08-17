@@ -22,8 +22,8 @@ namespace AOVI_EXE.Models
         List<ParsingModel> P_Parsing = new List<ParsingModel>();
         public void DataReceived()     //object sender, System.Windows.Forms.WebBrowserDocumentCompletedEventArgs e
         {
-            
-            Global.url = "https://www.hani.co.kr/arti/politics/politics_general/1052888.html?_ns=t1";
+
+            Global.url = "https://www.naver.com/";
             WebClient client = new WebClient();
             client.Encoding = Encoding.UTF8;
             string htmlstr = client.DownloadString(Global.url);
@@ -35,6 +35,7 @@ namespace AOVI_EXE.Models
             foreach (HtmlNode aNode in bodynode.SelectNodes("//a | //img | //td | //p | //li"))
             {
                 ParsingModel parsingText = new ParsingModel();
+                parsingText.imgcheck = false;
                 if (aNode.Name == "a")
                 {
                     parsingText.divtd = aNode.InnerText;
@@ -42,15 +43,17 @@ namespace AOVI_EXE.Models
                 }
                 else if (aNode.Name == "img")
                 {
-                    parsingText.ahref = aNode.Attributes["src"].Value;
-
-                    string fileName = @"C:\Image\a.png";
                     try
                     {
+                        parsingText.ahref = aNode.Attributes["src"].Value;
+                        parsingText.imgcheck = true;
+
+                        string fileName = @"C:\Image\PageImage.png";
+
                         //if (DownloadRemoteImageFile(parsingText.ahref, fileName))
                         //{
                         //    SendData(fileName);
-                        //    ReceivedData();
+                        //    //    ReceivedData();
                         //}
                     }
                     catch (Exception ex)
@@ -60,7 +63,10 @@ namespace AOVI_EXE.Models
                 }
                 else
                     parsingText.divtd = aNode.InnerText;
-                P_Parsing.Add(parsingText);
+                if (!string.IsNullOrEmpty(parsingText.divtd) && (parsingText.divtd.Contains("\t") || parsingText.divtd.Contains("\r")))
+                    continue;
+                else
+                    P_Parsing.Add(parsingText);
             }
             Global.ReceivedData = P_Parsing;
         }
@@ -129,9 +135,9 @@ namespace AOVI_EXE.Models
 
                 var takeInfo = JsonConvert.DeserializeObject<dynamic>(response);
             }
-            catch(Exception ex) 
+            catch (Exception ex)
             {
-                
+
             }
         }
 

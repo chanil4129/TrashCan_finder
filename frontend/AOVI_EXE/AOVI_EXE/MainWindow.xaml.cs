@@ -31,12 +31,6 @@ namespace AOVI_EXE
             Height = Properties.Settings.Default.Height;
 
             this.KeyDown += MainVeiw_KeyDown;
-
-            //timer.Stop();
-            //timer.Interval = TimeSpan.FromSeconds(300);
-            //timer.Tick += new System.EventHandler(timer_Tick);
-            //timer.Start();
-            //timer_Tick(null, null);
         }
 
         void MainVeiw_KeyDown(object sender, KeyEventArgs e)
@@ -55,18 +49,20 @@ namespace AOVI_EXE
 
                     }
                 }
-                else
+                else if(e.Key.ToString() == "Right" || e.Key.ToString() == "Left")
                 {
                     string text = Global.ReceivedData[Global.Textorder].divtd;
                     string link = Global.ReceivedData[Global.Linkorder].ahref;
 
                     speechSynthesizer.SetOutputToDefaultAudioDevice();
-
+                    
                     speechSynthesizer.SelectVoice("Microsoft Heami Desktop");
                     if (e.Key.ToString() == "Right")
                     {
                         Global.Textorder++;
                         Global.Linkorder++;
+                        if (!string.IsNullOrEmpty(link))
+                            text += "로 이동을 원하시면 F10을 눌러주세요.";
                         speechSynthesizer.Speak(text);
                     }
                     if (e.Key.ToString() == "Left")
@@ -75,6 +71,9 @@ namespace AOVI_EXE
                         {
                             Global.Textorder--;
                             Global.Linkorder--;
+                            if (!string.IsNullOrEmpty(link))
+                                text += "를 원하시면 F10을 눌러주세요.";
+                            speechSynthesizer.Speak(text);
                         }
 
                     }
