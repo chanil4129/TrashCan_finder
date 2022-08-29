@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:naver_map_plugin/naver_map_plugin.dart';
+import 'dart:async';
 
 void main() {
   runApp(const MyApp());
@@ -22,10 +24,6 @@ class _MyAppState extends State<MyApp> {
       home: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.amber,
-          // leading: IconButton(
-          //   icon: Icon(Icons.menu),
-          //   onPressed: () {},
-          // ),
           title: Text('TrashCan_finder'),
           actions: [
             IconButton(
@@ -97,7 +95,16 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        body: GarbageChips(),
+        body: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 50,
+              child: GarbageChips(),
+            ),
+            Expanded(child: NaverMapTest())
+          ],
+        ),
         bottomNavigationBar: Text("bottom"),
       ),
     );
@@ -221,6 +228,34 @@ class _GarbageChipsState extends State<GarbageChips> {
     );
   }
 }
+
+class NaverMapTest extends StatefulWidget {
+  @override
+  _NaverMapTestState createState() => _NaverMapTestState();
+}
+
+class _NaverMapTestState extends State<NaverMapTest> {
+  Completer<NaverMapController> _controller = Completer();
+  MapType _mapType = MapType.Basic;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        child: NaverMap(
+          onMapCreated: onMapCreated,
+          mapType: _mapType,
+        ),
+      ),
+    );
+  }
+
+  void onMapCreated(NaverMapController controller) {
+    if (_controller.isCompleted) _controller = Completer();
+    _controller.complete(controller);
+  }
+}
+
 
 getPermission() async {
   Map<Permission, PermissionStatus> statuses = await [
