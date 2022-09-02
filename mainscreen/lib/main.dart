@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
-// import 'package:permission_handler/permission_handler.dart';
 import 'dart:async';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -16,10 +16,9 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _UserMainScreen();
 }
 
-
-class _UserMainScreen extends State<MyApp>{
+class _UserMainScreen extends State<MyApp> {
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
@@ -30,15 +29,26 @@ class _UserMainScreen extends State<MyApp>{
             child: Text("쓰레기 분리수거 찾기"),
           ),
         ),
-        body: Column(
+        // body: Column(
+        //   children: [
+        //     Container(
+        //       width: double.infinity,
+        //       height: 40,
+        //       child: Category(),
+        //       color: Colors.transparent,
+        //     ),
+        //     Expanded(child: NaverMap_User())
+        //   ],
+        // ),
+        body: Stack(
           children: [
-            // Container(
-            //   width: double.infinity,
-            //   height: 40,
-            //   child: Category(),
-            //   color: Colors.white,
-            // ),
-            Expanded(child: NaverMap_User())
+            Positioned(child: NaverMap_User()),
+            Container(
+              width: double.infinity,
+              height: 40,
+              child: Category(),
+              color: Colors.transparent,
+            )
           ],
         ),
         drawer: Login(),
@@ -47,20 +57,83 @@ class _UserMainScreen extends State<MyApp>{
   }
 }
 
+class Category extends StatefulWidget {
+  const Category({Key? key}) : super(key: key);
 
-class Login extends StatefulWidget{
+  @override
+  State<Category> createState() => _CategoryItemState();
+}
+
+class _CategoryItemState extends State<Category> {
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          body: Container(
+            color: Colors.transparent,
+            height: 40,
+            child: Container(
+                margin: EdgeInsets.fromLTRB(7, 0, 7, 0),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                        child: InputChip(
+                          avatar: new Image.asset(
+                              'myasset/myimage/general_waste.png'),
+                          label: Text('일반쓰레기'),
+                          onPressed: () => ProgramAccessShopData,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                        child: InputChip(
+                          avatar:
+                              new Image.asset('myasset/myimage/plastic.png'),
+                          label: Text('플라스틱'),
+                          onSelected: (bool value) {},
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                        child: InputChip(
+                          avatar: new Image.asset('myasset/myimage/can.png'),
+                          label: Text('캔'),
+                          onSelected: (bool value) {},
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
+                        child: InputChip(
+                          avatar: new Image.asset(
+                              'myasset/myimage/glass_bottle.png'),
+                          label: Text('병'),
+                          onSelected: (bool value) {},
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ),
+        ));
+  }
+}
+
+class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
 
   @override
   State<Login> createState() => _LoginState();
 }
 
-class _LoginState extends State<Login>{
+class _LoginState extends State<Login> {
   final bool login = false;
 
   @override
-  Widget build(BuildContext context){
-    if(login){
+  Widget build(BuildContext context) {
+    if (login) {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -73,15 +146,14 @@ class _LoginState extends State<Login>{
             ),
             ListTile(
               title: Text('고객 정보'),
-              onTap: (){
+              onTap: () {
                 Navigator.pop(context);
               },
             )
           ],
         ),
       );
-    }
-    else{
+    } else {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -94,13 +166,13 @@ class _LoginState extends State<Login>{
             ),
             ListTile(
               title: Text('로그인'),
-              onTap: (){
-                ProgramAccessLogin();
+              onTap: () {
+                ProgramAccessShopData();
               },
             ),
             ListTile(
               title: Text('회원가입'),
-              onTap: (){
+              onTap: () {
                 Navigator.pop(context);
               },
             )
@@ -116,11 +188,9 @@ class NaverMap_User extends StatefulWidget {
   _NaverMapUserState createState() => _NaverMapUserState();
 }
 
-
 class _NaverMapUserState extends State<NaverMap_User> {
   Completer<NaverMapController> _controller = Completer();
   MapType _mapType = MapType.Basic;
-
 
   @override
   Widget build(BuildContext context) {
@@ -151,17 +221,17 @@ class _NaverMapUserState extends State<NaverMap_User> {
     LocationData _locationData;
 
     _serviceEnabled = await location.serviceEnabled();
-    if(!_serviceEnabled){
+    if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
-      if(!_serviceEnabled){
+      if (!_serviceEnabled) {
         return;
       }
     }
 
     _permissionGranted = await location.hasPermission();
-    if(_permissionGranted == PermissionStatus.denied){
+    if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
-      if(_permissionGranted != PermissionStatus.granted){
+      if (_permissionGranted != PermissionStatus.granted) {
         return;
       }
     }
@@ -171,36 +241,54 @@ class _NaverMapUserState extends State<NaverMap_User> {
 }
 
 
-// getPermission() async {
-//   Map<Permission, PermissionStatus> statuses = await [
-//     Permission.location,
-//   ].request();
-// }
+Future<void> ProgramAccessShopData() async{
+  Future<double?> latitude = currentlatitude();
+  Future<double?> altitude = currentaltitude();
 
-Future<void> ProgramAccessLogin() async{
-  String geturl = 'http://52.79.202.39/?REQ=api_LOGIN&USER_ID='+'bluehill'+'&USER_PW='+'qmffnglf'+'&USER_TYPE='+'SHOP';
-  Uri  url = Uri.parse(geturl);
+  String geturl = 'http://52.79.202.39/?REQ=post_GET_NEAR_SHOP&CUR_LOCATION=' +
+  'LNG:' + altitude.toString() + ',LAT:' + latitude.toString() +
+  '&CATEGORY=' + 'SHOP';
+  Uri url = Uri.parse(geturl);
 
   http.Response response = await http.get(url);
-  // http.Response response = await http.post(
-  //   url,
-  //   headers: <String,String>{
-  //     'Content-Type': 'application/x-www-form-urlencoded',
-  //   },
-  //   body: <String,String>{
-  //     'USER_ID': 'bluehill',
-  //     'USER_PW': 'qmffnglf',
-  //     'USER_TYPE': 'SHOP'
-  //   }
-  // );
-  if(response != null){
-    print(response);
-  }
-  else{
+  if (response != null) {
+    print(response.body);
+  } else {
     print("hi");
   }
 }
 
-void ProgramAccessSign(){
+Future<double?> currentlatitude() async{
+  Location current = new Location();
+  LocationData _locationData;
+  _locationData = await current.getLocation();
 
+  return _locationData.latitude;
 }
+Future<double?> currentaltitude() async{
+  Location current = new Location();
+  LocationData _locationData;
+  _locationData = await current.getLocation();
+
+  return _locationData.altitude;
+}
+
+
+Future<void> ProgramAccessLogin() async {
+  String geturl = 'http://52.79.202.39/?REQ=api_LOGIN&USER_ID=' +
+      'bluehill' +
+      '&USER_PW=' +
+      'qmffnglf' +
+      '&USER_TYPE=' +
+      'SHOP';
+  Uri url = Uri.parse(geturl);
+
+  http.Response response = await http.get(url);
+  if (response != null) {
+    print(response.body);
+  } else {
+    print("hi");
+  }
+}
+
+void ProgramAccessSign() {}
