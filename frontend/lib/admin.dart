@@ -4,50 +4,97 @@ import 'dart:developer';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-fetchStore() async{
-  final uri = Uri.parse("http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=01012345678&CATEGORY=SHOP");
+
+Future<Store> fetchStore() async {
+  final uri = Uri.parse(
+      "http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=01012345678&CATEGORY=SHOP");
   var response = await http.get(uri);
-  print(response.body);
+
+  if (response.statusCode == 200) {
+    print("SUCCESSFULLY GET");
+    print(json.decode(response.body));
+    return Store.fromJson(json.decode(response.body));
+  } else {
+    throw Exception("정보 가져오기 실패");
+  }
 }
-void main() async{
+
+void main() async {
   fetchStore();
-  //runApp(Admin());
+  runApp(Admin());
 }
-/*class Store {
+
+class ShopLocation {
+  late double lng;
+  late double lat;
+
+  ShopLocation({required this.lng, required this.lat});
+
+  factory ShopLocation.fromJson(Map<String, dynamic> json) {
+    return ShopLocation(lng: json['LNG'], lat: json['LAT']);
+  }
+}
+
+class TrashType {
+  late bool general;
+  late bool pet;
+  late bool cans;
+  late bool paper;
+
+  TrashType(
+      {required this.general,
+        required this.pet,
+        required this.cans,
+        required this.paper});
+
+  factory TrashType.fromJson(Map<String, dynamic> json) {
+    return TrashType(
+        general: json['GENERAL'],
+        pet: json['PET'],
+        cans: json['CANS'],
+        paper: json['PAPER']);
+  }
+}
+
+class Store {
   final String shopName;
   final String shopAddress;
   final String shopNumber;
   final bool shopIsOpen;
   final int shopPoint;
-  final  shopLocation;
+  final shopLocation;
   final trashType;
-  Store({
-    this.shopName='',
-    this.shopAddress='',
-    this.shopNumber='',
-    this.shopIsOpen=false,
-    this.shopPoint=0,
-    this.trashType = {}
-  });
-  Store.fromJson(Map<String,dynamic> json)
-      : shopName = json['SHOP_NAME'],
-      shopAddress= json['SHOP_ADDRESS'],
-      shopNumber=json['SHOP_NUMBER'],
-      shopIsOpen= json['SHOP_IS_OPEN'],
-      shopPoint=json['SHOP_POINT'],
-      trashType = json['TRASH_TYPE'],
-      shopLocation = json['SHOP_LOCATION'];
 
-  Map<String,dynamic> toJson() => {
-    'SHOP_NAME' : shopName,
-    'SHOP_ADDRESS' : shopAddress,
-    'SHOP_NUMBER':shopNumber,
-    'SHOP_IS_OPEN':shopIsOpen,
-    'SHOP_POINT':shopPoint,
-    'TRASH_TYPE':trashType,
-    'SHOP_LOCATION':shopLocation
+  Store(
+      {required this.shopName,
+        required this.shopAddress,
+        required this.shopNumber,
+        required this.shopIsOpen,
+        required this.shopPoint,
+        required this.shopLocation,
+        required this.trashType});
+
+  factory Store.fromJson(Map<String, dynamic> json) {
+    return Store(
+        shopName: json['SHOP_NAME'],
+        shopAddress: json['SHOP_ADDRESS'],
+        shopNumber: json['SHOP_NUMBER'],
+        shopIsOpen: json['SHOP_IS_OPEN'],
+        shopPoint: json['SHOP_POINT'],
+        trashType: TrashType.fromJson(json['TRASH_TYPE']),
+        shopLocation: ShopLocation.fromJson(json['SHOP_LOCATION']));
+  }
+
+  Map<String, dynamic> toJson() => {
+    'SHOP_NAME': shopName,
+    'SHOP_ADDRESS': shopAddress,
+    'SHOP_NUMBER': shopNumber,
+    'SHOP_IS_OPEN': shopIsOpen,
+    'SHOP_POINT': shopPoint,
+    'TRASH_TYPE': trashType,
+    'SHOP_LOCATION': shopLocation
   };
-}*/
+}
 
 class Admin extends StatefulWidget {
   const Admin({Key? key}) : super(key: key);
@@ -57,12 +104,13 @@ class Admin extends StatefulWidget {
 }
 
 class _AdminState extends State<Admin> {
-  //Future<Store>? store;
+  late Future<Store> store;
   @override
-  void initState(){
+  void initState() {
     super.initState();
-    fetchStore();
+    store = fetchStore();
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -85,10 +133,30 @@ class _AdminState extends State<Admin> {
                           Icons.control_point_duplicate,
                           color: Colors.blue,
                         ),
-                        Text('적립금: ',
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold)),
+                        FutureBuilder<Store>(
+                            future: store,
+                            builder: (BuildContext context, AsyncSnapshot snapshot) {
+                              if (snapshot.hasData == false) {
+                                return CircularProgressIndicator();
+                              } else if (snapshot.hasError) {
+                                return Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'Error: ${snapshot.error}',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                );
+                              }else{
+                                print(snapshot.data.shopPoint);
+                                return  Text('적립금: ${snapshot.data.shopPoint}',
+                                    style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold));
+                              }
+                            }
+                        )
+
+
                       ],
                     ),
                   ],
@@ -130,92 +198,100 @@ class _AdminState extends State<Admin> {
                                   flex: 7,
                                   child: Row(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Expanded(
                                         child: Container(
                                             margin: const EdgeInsets.all(10),
                                             child: Column(
-                                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
                                               children: [
                                                 Container(
                                                   child: Image.asset(
-                                                    "assets/rawfish.jpg",
+                                                    "assets/rawsfish.jpg",
                                                     fit: BoxFit.fill,
                                                   ),
                                                 ),
-                                                ElevatedButton(onPressed: (){}, child: Text("변경 내용 저장",style: TextStyle(color: Colors.black),),
-                                                  style: ElevatedButton.styleFrom(
-                                                    primary: Colors.amber
+                                                ElevatedButton(
+                                                  onPressed: () {},
+                                                  child: Text(
+                                                    "변경 내용 저장",
+                                                    style: TextStyle(
+                                                        color: Colors.black),
                                                   ),
+                                                  style:
+                                                  ElevatedButton.styleFrom(
+                                                      primary:
+                                                      Colors.amber),
                                                 )
                                               ],
                                             )),
                                       ),
                                       Expanded(
                                           child: Container(
-                                        margin: const EdgeInsets.all(10),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Text(
-                                              '',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 16),
-                                            ),
-                                            Row(
-                                              mainAxisSize: MainAxisSize.max,
+                                            margin: const EdgeInsets.all(10),
+                                            child: Column(
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Icon(Icons.pin_drop),
-                                                Expanded(
-                                                  child: Text(
-                                                      "서울 마포구 독막로9길 9 1층",
-                                                      style: TextStyle(
-                                                          color: Colors.grey,
-                                                          fontSize: 12)),
-                                                ),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                Icon(Icons.phone),
-                                                Expanded(
-                                                    child: Text(
-                                                        "0507-1329-8117",
-                                                        style: TextStyle(
-                                                            fontSize: 12))),
-                                              ],
-                                            ),
-                                            Row(
+                                              CrossAxisAlignment.start,
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
                                               children: [
                                                 Text(
-                                                  "가게 활성화",
+                                                  '',
                                                   style: TextStyle(
-                                                    color: Colors.black,
-                                                    //fontSize: 18,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 16),
                                                 ),
-                                                Switch(
-                                                    activeColor:
+                                                Row(
+                                                  mainAxisSize: MainAxisSize.max,
+                                                  crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                                  children: [
+                                                    Icon(Icons.pin_drop),
+                                                    Expanded(
+                                                      child: Text(
+                                                          "서울 마포구 독막로9길 9 1층",
+                                                          style: TextStyle(
+                                                              color: Colors.grey,
+                                                              fontSize: 12)),
+                                                    ),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Icon(Icons.phone),
+                                                    Expanded(
+                                                        child: Text(
+                                                            "0507-1329-8117",
+                                                            style: TextStyle(
+                                                                fontSize: 12))),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      "가게 활성화",
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        //fontSize: 18,
+                                                        fontWeight: FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    Switch(
+                                                        activeColor:
                                                         Colors.blueAccent,
-                                                    value: false,
-                                                    onChanged: (value) {
-                                                      setState(() {
-                                                        //_isOpen = value;
-                                                      });
-                                                    }),
+                                                        value: false,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            //_isOpen = value;
+                                                          });
+                                                        }),
+                                                  ],
+                                                ),
                                               ],
                                             ),
-                                          ],
-                                        ),
-                                      ))
+                                          ))
                                     ],
                                   ),
                                 ),
@@ -253,7 +329,7 @@ class _AdminState extends State<Admin> {
                                 height: 50,
                                 child: Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
+                                  MainAxisAlignment.spaceAround,
                                   children: [
                                     Text(
                                       '',
@@ -274,9 +350,9 @@ class _AdminState extends State<Admin> {
                             },
                             separatorBuilder: (BuildContext context, int idx) =>
                                 Divider(
-                              height: 10.0,
-                              color: Colors.white,
-                            ),
+                                  height: 10.0,
+                                  color: Colors.white,
+                                ),
                           ),
                         ),
                         Expanded(
@@ -294,12 +370,11 @@ class _AdminState extends State<Admin> {
                                     offset: Offset(0, 3),
                                   )
                                 ]),
-                            child:
-                              Column(
-                                children: [
-                                  Text("나중에 내역같은거 보여줄까?"),
-                                ],
-                              ),
+                            child: Column(
+                              children: [
+                                Text("나중에 내역같은거 보여줄까?"),
+                              ],
+                            ),
                           ),
                         ),
                       ],
