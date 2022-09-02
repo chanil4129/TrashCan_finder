@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   permission_handler: ^10.0.0
   http: ^0.13.5
+  responsive_builder: ^0.1.2
 dev_dependencies:
   flutter_test:
     sdk: flutter
