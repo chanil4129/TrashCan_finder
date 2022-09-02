@@ -1,52 +1,53 @@
 import 'dart:math';
+import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-
-void main() {
-  runApp(Admin());
+import 'package:http/http.dart' as http;
+fetchStore() async{
+  final uri = Uri.parse("http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=01012345678&CATEGORY=SHOP");
+  var response = await http.get(uri);
+  print(response.body);
 }
-
-class store {
-  String name = '';
-  String phoneNumber = '';
-  String address = '';
-  bool isOpen = false;
+void main() async{
+  fetchStore();
+  //runApp(Admin());
 }
+/*class Store {
+  final String shopName;
+  final String shopAddress;
+  final String shopNumber;
+  final bool shopIsOpen;
+  final int shopPoint;
+  final  shopLocation;
+  final trashType;
+  Store({
+    this.shopName='',
+    this.shopAddress='',
+    this.shopNumber='',
+    this.shopIsOpen=false,
+    this.shopPoint=0,
+    this.trashType = {}
+  });
+  Store.fromJson(Map<String,dynamic> json)
+      : shopName = json['SHOP_NAME'],
+      shopAddress= json['SHOP_ADDRESS'],
+      shopNumber=json['SHOP_NUMBER'],
+      shopIsOpen= json['SHOP_IS_OPEN'],
+      shopPoint=json['SHOP_POINT'],
+      trashType = json['TRASH_TYPE'],
+      shopLocation = json['SHOP_LOCATION'];
 
-class Item {
-  String category = '';
-  bool isPos = false;
-
-  Item(String category, bool isPos) {
-    this.category = category;
-    this.isPos = isPos;
-  }
-}
-
-Item ttt = Item('', false);
-var trash = <List>[
-  ['일반쓰레기', false],
-  ['플라스틱', false],
-  ['캔', false],
-  ['병', false],
-  ['종이', false],
-  ['박스', false],
-];
-
-List<Item> set_trash() {
-  List<Item> items = [ttt];
-  for (int i = 0; i < trash.length; i++) {
-    Item tmp = Item(trash[i][0], trash[i][1]);
-    items.add(tmp);
-  }
-  items.removeAt(0);
-  return items;
-}
-
-String _storeName = '바다포차 시실리';
-int _reserves = 4567; // 적립금
-bool _isOpen = true;
+  Map<String,dynamic> toJson() => {
+    'SHOP_NAME' : shopName,
+    'SHOP_ADDRESS' : shopAddress,
+    'SHOP_NUMBER':shopNumber,
+    'SHOP_IS_OPEN':shopIsOpen,
+    'SHOP_POINT':shopPoint,
+    'TRASH_TYPE':trashType,
+    'SHOP_LOCATION':shopLocation
+  };
+}*/
 
 class Admin extends StatefulWidget {
   const Admin({Key? key}) : super(key: key);
@@ -56,8 +57,12 @@ class Admin extends StatefulWidget {
 }
 
 class _AdminState extends State<Admin> {
-  List<Item> Items = set_trash();
-
+  //Future<Store>? store;
+  @override
+  void initState(){
+    super.initState();
+    fetchStore();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -80,7 +85,7 @@ class _AdminState extends State<Admin> {
                           Icons.control_point_duplicate,
                           color: Colors.blue,
                         ),
-                        Text('적립금: $_reserves',
+                        Text('적립금: ',
                             style: TextStyle(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold)),
@@ -157,7 +162,7 @@ class _AdminState extends State<Admin> {
                                               MainAxisAlignment.spaceAround,
                                           children: [
                                             Text(
-                                              '$_storeName',
+                                              '',
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 16),
@@ -200,10 +205,10 @@ class _AdminState extends State<Admin> {
                                                 Switch(
                                                     activeColor:
                                                         Colors.blueAccent,
-                                                    value: _isOpen,
+                                                    value: false,
                                                     onChanged: (value) {
                                                       setState(() {
-                                                        _isOpen = value;
+                                                        //_isOpen = value;
                                                       });
                                                     }),
                                               ],
@@ -228,7 +233,7 @@ class _AdminState extends State<Admin> {
                         Expanded(
                           child: ListView.separated(
                             padding: const EdgeInsets.all(5),
-                            itemCount: Items.length,
+                            itemCount: 5,
                             itemBuilder: (BuildContext context, int idx) {
                               return Container(
                                 padding: const EdgeInsets.all(5),
@@ -251,16 +256,16 @@ class _AdminState extends State<Admin> {
                                       MainAxisAlignment.spaceAround,
                                   children: [
                                     Text(
-                                      '${Items[idx].category}',
+                                      '',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Switch(
                                         activeColor: Colors.blueAccent,
-                                        value: Items[idx].isPos,
+                                        value: false,
                                         onChanged: (value) {
                                           setState(() {
-                                            Items[idx].isPos = value;
+                                            //Items[idx].isPos = value;
                                           });
                                         })
                                   ],

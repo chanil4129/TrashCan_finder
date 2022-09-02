@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:naver_map_plugin/naver_map_plugin.dart';
+//import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'dart:async';
 
 void main() {
