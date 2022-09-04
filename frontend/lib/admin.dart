@@ -126,6 +126,7 @@ class Shop {
   String shopNumber = "전화번호";
   bool shopIsOpen = false;
   int shopPoint = 0;
+  bool start = false;
   List<int> shopLocation = [0, 0];
   List<String> trashName = ['일반쓰레기', '플라스틱/페트', '병/캔', '종이/박스'];
   List<bool> trashFlag = [false, false, false, false];
@@ -202,8 +203,10 @@ class _AdminState extends State<Admin> {
   void initState() {
     super.initState();
     store = fetchStore();
+    setState(() {
+      shop.start = true;
+    });
   }
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -253,8 +256,10 @@ class _AdminState extends State<Admin> {
               backgroundColor: Colors.amber,
             ),
             body:
-            Builder(
-              builder: (context) {
+            FutureBuilder(
+              future: store,
+              builder: (BuildContext context,AsyncSnapshot snapshot) {
+                shop.start = true;
                 return Container(
                   padding: EdgeInsets.all(5),
                   //margin: EdgeInsets.all(10),
@@ -393,7 +398,7 @@ class _AdminState extends State<Admin> {
                                                                         )
                                                                       ),
                                                                       onSubmitted: (String value) {
-                                                                        _shopNameController.clear();
+                                                                       // _shopNameController.clear();
                                                                       },
                                                                     ),
                                                                   ),
@@ -411,7 +416,7 @@ class _AdminState extends State<Admin> {
                                                                           )
                                                                       ),
                                                                       onSubmitted: (String value) {
-                                                                        _shopAddressController.clear();
+                                                                        //_shopAddressController.clear();
                                                                       },
                                                                     ),
                                                                   ),
@@ -429,7 +434,7 @@ class _AdminState extends State<Admin> {
                                                                           )
                                                                       ),
                                                                       onSubmitted: (String value) {
-                                                                        _shopNumberController.clear();
+                                                                       // _shopNumberController.clear();
                                                                       },
                                                                     ),
                                                                   )
@@ -476,6 +481,7 @@ class _AdminState extends State<Admin> {
                                                                   child: Text('저장')
                                                               ),
                                                               ElevatedButton(onPressed: (){
+                                                                _handleSubmitted();
                                                                 Navigator.of(context).pop();
                                                               },
                                                                 child: Text('닫기'),
