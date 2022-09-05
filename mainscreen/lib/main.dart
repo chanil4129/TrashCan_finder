@@ -1,9 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:naver_map_plugin/naver_map_plugin.dart';
+
 import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+
+import 'UserLatitude.dart';
 
 void main() {
   runApp(const MyApp());
@@ -29,20 +32,11 @@ class _UserMainScreen extends State<MyApp> {
             child: Text("쓰레기 분리수거 찾기"),
           ),
         ),
-        // body: Column(
-        //   children: [
-        //     Container(
-        //       width: double.infinity,
-        //       height: 40,
-        //       child: Category(),
-        //       color: Colors.transparent,
-        //     ),
-        //     Expanded(child: NaverMap_User())
-        //   ],
-        // ),
         body: Stack(
           children: [
-            Positioned(child: NaverMap_User()),
+            Positioned(
+              child: NaverMap_User()
+            ),
             Container(
               width: double.infinity,
               height: 40,
@@ -70,7 +64,6 @@ class _CategoryItemState extends State<Category> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           body: Container(
-            color: Colors.transparent,
             height: 40,
             child: Container(
                 margin: EdgeInsets.fromLTRB(7, 0, 7, 0),
@@ -84,6 +77,7 @@ class _CategoryItemState extends State<Category> {
                           avatar: new Image.asset(
                               'myasset/myimage/general_waste.png'),
                           label: Text('일반쓰레기'),
+                          backgroundColor: Colors.white,
                           onPressed: () => ProgramAccessShopData,
                         ),
                       ),
@@ -93,6 +87,7 @@ class _CategoryItemState extends State<Category> {
                           avatar:
                               new Image.asset('myasset/myimage/plastic.png'),
                           label: Text('플라스틱'),
+                          backgroundColor: Colors.white,
                           onSelected: (bool value) {},
                         ),
                       ),
@@ -101,6 +96,7 @@ class _CategoryItemState extends State<Category> {
                         child: InputChip(
                           avatar: new Image.asset('myasset/myimage/can.png'),
                           label: Text('캔'),
+                          backgroundColor: Colors.white,
                           onSelected: (bool value) {},
                         ),
                       ),
@@ -110,6 +106,7 @@ class _CategoryItemState extends State<Category> {
                           avatar: new Image.asset(
                               'myasset/myimage/glass_bottle.png'),
                           label: Text('병'),
+                          backgroundColor: Colors.white,
                           onSelected: (bool value) {},
                         ),
                       ),
@@ -245,8 +242,10 @@ Future<void> ProgramAccessShopData() async{
   Future<double?> latitude = currentlatitude();
   Future<double?> altitude = currentaltitude();
 
+  String location = '''{"LNG":''' + "123.002" + ''',"LAT":''' + "125.002" +'''}''';
+
   String geturl = 'http://52.79.202.39/?REQ=post_GET_NEAR_SHOP&CUR_LOCATION=' +
-  'LNG:' + altitude.toString() + ',LAT:' + latitude.toString() +
+
   '&CATEGORY=' + 'SHOP';
   Uri url = Uri.parse(geturl);
 
@@ -265,6 +264,7 @@ Future<double?> currentlatitude() async{
 
   return _locationData.latitude;
 }
+
 Future<double?> currentaltitude() async{
   Location current = new Location();
   LocationData _locationData;
