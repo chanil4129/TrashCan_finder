@@ -1,12 +1,12 @@
-
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
 
-import 'UserLatitude.dart';
+UserLocation userLocation = UserLocation();
 
 void main() {
   runApp(const MyApp());
@@ -194,10 +194,10 @@ class _NaverMapUserState extends State<NaverMap_User> {
     return Scaffold(
       body: Container(
         child: NaverMap(
-          // initialCameraPosition: CameraPosition(
-          //   target: LatLng(27.6602292, 85.308027),
-          //   zoom: 17,
-          // ),
+          initialCameraPosition: CameraPosition(
+            target: LatLng(37.5562611, 126.9239317),
+            zoom: 17,
+          ),
           onMapCreated: onMapCreated,
           mapType: _mapType,
         ),
@@ -209,70 +209,51 @@ class _NaverMapUserState extends State<NaverMap_User> {
     if (_controller.isCompleted) _controller = Completer();
     _controller.complete(controller);
   }
-
-  Future<void> onLocation() async {
-    Location location = new Location();
-
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-  }
 }
 
+class UserLocation{
+  double lat = 0.0;
+  double lng = 0.0;
+}
 
 Future<void> ProgramAccessShopData() async{
-  Future<double?> latitude = currentlatitude();
-  Future<double?> altitude = currentaltitude();
+  Location location = new Location();
 
-  String location = '''{"LNG":''' + "123.002" + ''',"LAT":''' + "125.002" +'''}''';
+  bool _serviceEnabled;
+  PermissionStatus _permissionGranted;
+  LocationData _locationData;
 
-  String geturl = 'http://52.79.202.39/?REQ=post_GET_NEAR_SHOP&CUR_LOCATION=' +
+  _serviceEnabled = await location.serviceEnabled();
+  if (!_serviceEnabled) {
+    _serviceEnabled = await location.requestService();
+    if (!_serviceEnabled) {
+      return;
+    }
+  }
 
+  _permissionGranted = await location.hasPermission();
+  if (_permissionGranted == PermissionStatus.denied) {
+    _permissionGranted = await location.requestPermission();
+    if (_permissionGranted != PermissionStatus.granted) {
+      return;
+    }
+  }
+
+  _locationData = await location.getLocation();
+
+  String current_location = '''{"LNG":''' + _locationData.longitude.toString() + ''',"LAT":''' + _locationData.latitude.toString() +'''}''';
+
+  String geturl = 'http://52.79.202.39/?REQ=post_GET_NEAR_SHOP&CUR_LOCATION=' + current_location +
   '&CATEGORY=' + 'SHOP';
   Uri url = Uri.parse(geturl);
 
   http.Response response = await http.get(url);
   if (response != null) {
-    print(response.body);
+    print(json.decode(response.body));
   } else {
     print("hi");
   }
 }
-
-Future<double?> currentlatitude() async{
-  Location current = new Location();
-  LocationData _locationData;
-  _locationData = await current.getLocation();
-
-  return _locationData.latitude;
-}
-
-Future<double?> currentaltitude() async{
-  Location current = new Location();
-  LocationData _locationData;
-  _locationData = await current.getLocation();
-
-  return _locationData.altitude;
-}
-
 
 Future<void> ProgramAccessLogin() async {
   String geturl = 'http://52.79.202.39/?REQ=api_LOGIN&USER_ID=' +
