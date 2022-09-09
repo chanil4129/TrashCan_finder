@@ -39,17 +39,17 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Throw_away'),
-        body: Stack(
-          children: [
-            Positioned(child: NaverMap_User()),
-            Container(
-              width: double.infinity,
-              height: 40,
-              child: Category(),
-              color: Colors.transparent,
-            )
-          ],
-        ),
+      ),
+      body: Stack(
+        children: [
+          Positioned(child: Container()/*NaverMap_User()*/),
+          Container(
+            width: double.infinity,
+            height: 40,
+            child: Container()/*Category()*/,
+            color: Colors.transparent,
+          )
+        ],
       ),
       drawer: ClientDrawer(),
     );
