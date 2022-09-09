@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'Drawer/drawer_main.dart';
 
 void main() {
   runApp(const MyApp());
@@ -50,6 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
+      drawer: ClientDrawer(),
     );
   }
 }
