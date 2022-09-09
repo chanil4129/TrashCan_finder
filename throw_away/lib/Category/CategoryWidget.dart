@@ -165,11 +165,11 @@ class _CategoryItemState extends State<Category> {
 
       List<Store> _ranks = [];
       _text = "";
-      http.Response rank_response = await http.get(url);
+      http.Response rank_response = await http.get(rank);
 
       if (rank_response != null) {
-        print(json.decode(response.body));
-        _text = utf8.decode(response.bodyBytes);
+        print(json.decode(rank_response.body));
+        _text = utf8.decode(rank_response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
         final List<Store> parsedResponse =
         dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
