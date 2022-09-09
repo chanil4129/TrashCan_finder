@@ -18,8 +18,8 @@ class _ClientDrawerState extends State<ClientDrawer> {
   late Login _myHomePage;
   late Admin _adminPage;
 
-  ClientDrawer(){
-    _myHomePage = new Login(title: 'title',login_onSubmit: login_onSubmit,);
+  _ClientDrawerState(){
+    _myHomePage = new Login(title: 'title',login_onSubmit: login_onSubmit);
     _adminPage = new Admin();
   }
 
