@@ -3,22 +3,22 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 
 //회원가입 확인
-class signIn extends StatefulWidget {
-  const signIn({Key? key}) : super(key: key);
+class signUp extends StatefulWidget {
+  const signUp({Key? key}) : super(key: key);
 
   @override
-  State<signIn> createState() => _signInState();
+  State<signUp> createState() => _signUpState();
 }
 
-class _signInState extends State<signIn> {
+class _signUpState extends State<signUp> {
   late Widget _choose_User_Shop;
-  late UserSignin _myUserSign;
-  late ShopSignin _myShopSign;
+  late UserSignUp _myUserSign;
+  late ShopSignUp _myShopSign;
 
-  _signInState(){
+  _signUpState(){
     _choose_User_Shop=new ChooseUserShop(User_Shop_Button: User_Shop_Button,);
-    _myUserSign=new UserSignin();
-    _myShopSign=new ShopSignin();
+    _myUserSign=new UserSignUp();
+    _myShopSign=new ShopSignUp();
     user_shop.u_s=0;
   }
 
@@ -93,14 +93,14 @@ class user_shop{
 }
 
 //User 회원가입 화면
-class UserSignin extends StatefulWidget {
-  const UserSignin({Key? key}) : super(key: key);
+class UserSignUp extends StatefulWidget {
+  const UserSignUp({Key? key}) : super(key: key);
 
   @override
-  State<UserSignin> createState() => _UserSigninState();
+  State<UserSignUp> createState() => _UserSignUpState();
 }
 
-class _UserSigninState extends State<UserSignin> {
+class _UserSignUpState extends State<UserSignUp> {
   final _UserID=TextEditingController();
   final _UserPwd=TextEditingController();
   final _UserPn=TextEditingController();
@@ -178,7 +178,7 @@ class _UserSigninState extends State<UserSignin> {
                 alignment: Alignment.centerRight,
                 child: FloatingActionButton.extended(
                   onPressed: () {
-                    Future<bool> _future=UserSigninhttp();
+                    Future<bool> _future=UserSignUphttp();
 
                     _future.then((val) {
                       Navigator.pop(context,true);
@@ -196,7 +196,7 @@ class _UserSigninState extends State<UserSignin> {
   }
 
   //BackEnd 통신(회원가입)
-  Future<bool> UserSigninhttp() async {
+  Future<bool> UserSignUphttp() async {
     String _UriInfo='http://52.79.202.39/?REQ=api_WP_USER_ADD&USER_ID=${_UserID.text}&USER_PW=${_UserPwd.text}&USER_TYPE=USER&PHONE_NUM=${_UserPn.text}';
     final url=Uri.parse(_UriInfo);
     final response = await http.get(url);
@@ -211,14 +211,14 @@ class _UserSigninState extends State<UserSignin> {
 }
 
 //Shop 회원가입 화면
-class ShopSignin extends StatefulWidget {
-  const ShopSignin({Key? key}) : super(key: key);
+class ShopSignUp extends StatefulWidget {
+  const ShopSignUp({Key? key}) : super(key: key);
 
   @override
-  State<ShopSignin> createState() => _ShopSigninState();
+  State<ShopSignUp> createState() => _ShopSignUpState();
 }
 
-class _ShopSigninState extends State<ShopSignin> {
+class _ShopSignUpState extends State<ShopSignUp> {
   final _ShopID=TextEditingController();
   final _ShopPwd=TextEditingController();
   final _ShopPn=TextEditingController();
@@ -338,7 +338,7 @@ class _ShopSigninState extends State<ShopSignin> {
                 alignment: Alignment.centerRight,
                 child: FloatingActionButton.extended(
                   onPressed: () {
-                    Future<bool> _future=ShopSigninhttp();
+                    Future<bool> _future=ShopSignUphttp();
 
                     _future.then((val) {
                       Navigator.pop(context,true);
@@ -355,7 +355,7 @@ class _ShopSigninState extends State<ShopSignin> {
     );
   }
 
-  Future<bool> ShopSigninhttp() async {
+  Future<bool> ShopSignUphttp() async {
     String _UriInfo='http://52.79.202.39/?REQ=api_WP_USER_ADD&USER_ID=${_ShopID.text}&USER_PW=${_ShopPwd.text}&USER_TYPE=SHOP&PHONE_NUM=${_ShopPn.text}';
     final url=Uri.parse(_UriInfo);
     final response = await http.get(url);
