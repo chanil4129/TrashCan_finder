@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+
 import 'Drawer/drawer_main.dart';
+import 'Category/CategoryWidget.dart';
+import 'Map/NaverMapAPI.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,11 +45,11 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-          Positioned(child: Container()/*NaverMap_User()*/),
+          Positioned(child: NaverMap_User()),
           Container(
             width: double.infinity,
             height: 40,
-            child: Container()/*Category()*/,
+            child: Category(),
             color: Colors.transparent,
           )
         ],
