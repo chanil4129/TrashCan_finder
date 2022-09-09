@@ -71,11 +71,6 @@ Future<bool> postStore(Shop store) async {
   return false;
 }
 
-void main() async {
-  fetchStore();
-  runApp(Admin());
-}
-
 class ShopLocation {
   late double lng;
   late double lat;

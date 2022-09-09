@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:throw_away_main/sign_up/signup_main.dart';
+import 'package:throw_away_main/log_in/login_main.dart';
+import 'package:throw_away_main/shop/shop.dart';
 
 class ClientDrawer extends StatefulWidget {
   const ClientDrawer({Key? key}) : super(key: key);
@@ -10,7 +14,14 @@ class ClientDrawer extends StatefulWidget {
 }
 
 class _ClientDrawerState extends State<ClientDrawer> {
-  final bool login = false;
+  bool login = false;
+  late Login _myHomePage;
+  late Admin _adminPage;
+
+  ClientDrawer(){
+    _myHomePage = new Login(title: 'title',login_onSubmit: login_onSubmit,);
+    _adminPage = new Admin();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,6 +40,10 @@ class _ClientDrawerState extends State<ClientDrawer> {
               title: Text('고객 정보'),
               onTap: () {
                 Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(builder: (context)=>_adminPage)
+                );
               },
             )
           ],
@@ -48,7 +63,11 @@ class _ClientDrawerState extends State<ClientDrawer> {
             ListTile(
               title: Text('로그인'),
               onTap: () {
-                // ProgramAccessShopData();
+                Navigator.pop(context);
+                Navigator.push(
+                    context,
+                    CupertinoPageRoute(builder: (context)=>_myHomePage)
+                );
               },
             ),
             ListTile(
@@ -65,5 +84,25 @@ class _ClientDrawerState extends State<ClientDrawer> {
         ),
       );
     }
+  }
+
+  void login_onSubmit(){
+    if(_myHomePage.userid==''&&_myHomePage.userpw=='') {
+      login=true;
+      setState(() {
+      });
+    }
+    else{
+      login=false;
+      setState(() {
+
+      });
+    }
+  }
+
+  void logout() {
+    setState(() {
+
+    });
   }
 }
