@@ -45,6 +45,7 @@ class _LoginState extends State<Login> {
               ),
             ),
             FloatingActionButton.extended(
+              heroTag: 'login',
               onPressed: widget.login_onSubmit,
               tooltip: 'login',
 

@@ -29,6 +29,7 @@ class _CategoryItemState extends State<Category> {
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
+                          heroTag: 'General',
                           onPressed: (){
                             this.ProgramAccessShopData("GENERAL");
                           },
@@ -41,6 +42,8 @@ class _CategoryItemState extends State<Category> {
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
+                          heroTag: 'pet',
+
                           onPressed: (){
                             this.ProgramAccessShopData("PET");
                           },
@@ -53,6 +56,8 @@ class _CategoryItemState extends State<Category> {
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
+                          heroTag: 'cans',
+
                           onPressed: (){
                             this.ProgramAccessShopData("CANS");
                           },
@@ -65,6 +70,8 @@ class _CategoryItemState extends State<Category> {
                       Container(
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
+                          heroTag: 'paper',
+
                           onPressed: (){
                             this.ProgramAccessShopData("PAPER");
                           },

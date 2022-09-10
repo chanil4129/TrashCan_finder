@@ -177,6 +177,8 @@ class _UserSignUpState extends State<UserSignUp> {
             Container(
                 alignment: Alignment.centerRight,
                 child: FloatingActionButton.extended(
+                  heroTag: 'usersignup',
+
                   onPressed: () {
                     Future<bool> _future=UserSignUphttp();
 
@@ -337,6 +339,8 @@ class _ShopSignUpState extends State<ShopSignUp> {
             Container(
                 alignment: Alignment.centerRight,
                 child: FloatingActionButton.extended(
+                  heroTag: 'shopsingup',
+
                   onPressed: () {
                     Future<bool> _future=ShopSignUphttp();
 
