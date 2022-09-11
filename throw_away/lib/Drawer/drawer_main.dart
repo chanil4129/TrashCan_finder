@@ -28,7 +28,6 @@ class _ClientDrawerState extends State<ClientDrawer> {
   @override
   Widget build(BuildContext context) {
     if (MemberInfo.mislogin) {
-    // if(false){
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -118,13 +117,14 @@ class _ClientDrawerState extends State<ClientDrawer> {
 
     print('isLogin Response status: ${response.statusCode}');
     print('isLogin Response body: ${response.body}');
+    print('jsondecode : ${jsonDecode(response.body)}');
 
-    // Map<String,dynamic> parseInfo=jsonDecode(response.body);
-    // MemberInfo.PhoneNum=parseInfo['ID_AUX'];
-    // MemberInfo.Category=parseInfo['CATEGORY'];
-    //
-    // print('asdfas'+MemberInfo.PhoneNum);
-    // print('asdfas'+MemberInfo.Category);
+    Map<String,dynamic> parseInfo=jsonDecode(jsonDecode(response.body));
+    MemberInfo.PhoneNum=parseInfo['ID_AUX'];
+    MemberInfo.Category=parseInfo['CATEGORY'];
+
+    print('asdfas'+MemberInfo.PhoneNum);
+    print('asdfas'+MemberInfo.Category);
 
 
     if(!response.body.contains('ID_MAIN')) throw 'error';
