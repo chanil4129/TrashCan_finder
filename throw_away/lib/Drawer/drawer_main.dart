@@ -44,7 +44,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
                 Navigator.pop(context);
                 Navigator.push(
                     context,
-                    CupertinoPageRoute(builder: (context)=>Admin())
+                    CupertinoPageRoute(builder: (context)=>Admin(shopAux : MemberInfo.PhoneNum))
                 );
               },
             ),
@@ -144,6 +144,12 @@ class _ClientDrawerState extends State<ClientDrawer> {
 
     print('asdfas'+MemberInfo.PhoneNum);
     print('asdfas'+MemberInfo.Category);
+
+    // String _UriInfo2='http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=01028282828&CATEGORY=SHOP';
+    // final url2=Uri.parse(_UriInfo2);
+    // final response2 = await http.get(url2);
+    //
+    // print('asdfkljsdakf: ${response2.body}');
 
 
     if(!response.body.contains('ID_MAIN')) throw 'error';

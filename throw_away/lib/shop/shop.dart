@@ -6,9 +6,9 @@ import 'package:http/http.dart' as http;
 
 Shop shop = Shop();
 
-Future<Store> fetchStore() async {
+Future<Store> fetchStore(String sa) async {
   final uri = Uri.parse(
-      "http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=01012345678&CATEGORY=SHOP");
+      "http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=${sa}&CATEGORY=SHOP");
   var response = await http.get(uri);
 
   if (response.statusCode == 200) {
@@ -23,7 +23,7 @@ Future<Store> fetchStore() async {
 Future<bool> postStore(Shop store) async {
   final response = await http.post(
     Uri.parse(
-        "http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=01012345678&CATEGORY=SHOP&JSON_UPDATE="
+        "http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${store.shopNumber}&CATEGORY=SHOP&JSON_UPDATE="
             "{"
             "\"SHOP_NAME\":\"${store.shopName}\","
             "\"SHOP_ADDRESS\":\"${store.shopAddress}\","
@@ -173,7 +173,8 @@ class Store {
 }
 
 class Admin extends StatefulWidget {
-  const Admin({Key? key}) : super(key: key);
+  const Admin({Key? key,required this.shopAux}) : super(key: key);
+  final String shopAux;
 
   @override
   State<Admin> createState() => _AdminState();
@@ -197,7 +198,7 @@ class _AdminState extends State<Admin> {
   @override
   void initState() {
     super.initState();
-    store = fetchStore();
+    store = fetchStore(widget.shopAux);
     setState(() {
       shop.start = true;
     });
