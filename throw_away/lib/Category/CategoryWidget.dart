@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
+import 'package:throw_away_main/Map/MarkerMap.dart';
 
 class Category extends StatefulWidget {
   const Category({Key? key}) : super(key: key);
@@ -30,10 +31,11 @@ class _CategoryItemState extends State<Category> {
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
                           heroTag: 'General',
-                          onPressed: (){
+                          onPressed: () {
                             this.ProgramAccessShopData("GENERAL");
                           },
-                          icon: new Image.asset('myasset/myimage/general_waste.png'),
+                          icon: new Image.asset(
+                              'myasset/myimage/general_waste.png'),
                           label: Text('일반쓰레기'),
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
@@ -43,8 +45,7 @@ class _CategoryItemState extends State<Category> {
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
                           heroTag: 'pet',
-
-                          onPressed: (){
+                          onPressed: () {
                             this.ProgramAccessShopData("PET");
                           },
                           icon: new Image.asset('myasset/myimage/plastic.png'),
@@ -57,8 +58,7 @@ class _CategoryItemState extends State<Category> {
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
                           heroTag: 'cans',
-
-                          onPressed: (){
+                          onPressed: () {
                             this.ProgramAccessShopData("CANS");
                           },
                           icon: new Image.asset('myasset/myimage/can.png'),
@@ -71,11 +71,11 @@ class _CategoryItemState extends State<Category> {
                         margin: EdgeInsets.fromLTRB(0, 0, 5, 0),
                         child: FloatingActionButton.extended(
                           heroTag: 'paper',
-
-                          onPressed: (){
+                          onPressed: () {
                             this.ProgramAccessShopData("PAPER");
                           },
-                          icon: new Image.asset('myasset/myimage/glass_bottle.png'),
+                          icon: new Image.asset(
+                              'myasset/myimage/glass_bottle.png'),
                           label: Text('종이'),
                           backgroundColor: Colors.white,
                           foregroundColor: Colors.black,
@@ -96,24 +96,29 @@ class _CategoryItemState extends State<Category> {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
     LocationData _locationData;
+    trash = trashType;
+    try {
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
+      _serviceEnabled = await location.serviceEnabled();
       if (!_serviceEnabled) {
-        return null;
+        _serviceEnabled = await location.requestService();
+        if (!_serviceEnabled) {
+          return null;
+        }
       }
-    }
 
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return null;
+      _permissionGranted = await location.hasPermission();
+      if (_permissionGranted == PermissionStatus.denied) {
+        _permissionGranted = await location.requestPermission();
+        if (_permissionGranted != PermissionStatus.granted) {
+          return null;
+        }
       }
+      _locationData = await location.getLocation();
     }
-    _locationData = await location.getLocation();
+    catch(e){
 
+    }
     ///여기까지
 
     ///주변 가게정보들 서버에 요청
@@ -121,17 +126,22 @@ class _CategoryItemState extends State<Category> {
       String current_location = "";
       if (TestMode) {
         current_location =
-            '''{"LNG":''' + '123.002' + ''',"LAT":''' + '125.002' + '''}''';
+            '''{"LNG":''' + '37.557' + ''',"LAT":''' + '126.92' + '''}''';
+
+        currentUser.lat = '37.557';
+        currentUser.lng = '126.92';
       } else {
-        current_location = '''{"LNG":''' +
-            _locationData.longitude.toString() +
-            ''',"LAT":''' +
-            _locationData.latitude.toString() +
-            '''}''';
+        ///다시 살려야됨
+        // current_location = '''{"LNG":''' +
+        //     _locationData.longitude.toString() +
+        //     ''',"LAT":''' +
+        //     _locationData.latitude.toString() +
+        //     '''}''';
+        //
+        // currentUser.lat = _locationData.latitude.toString();
+        // currentUser.lng = _locationData.longitude.toString();
       }
 
-      currentUser.lat = _locationData.latitude.toString();
-      currentUser.lng = _locationData.longitude.toString();
 
       String geturl =
           'http://52.79.202.39/?REQ=post_GET_NEAR_SHOP&CUR_LOCATION=' +
@@ -141,6 +151,7 @@ class _CategoryItemState extends State<Category> {
               '&TRASH_TYPE=' +
               trashType;
       Uri url = Uri.parse(geturl);
+
       ///여기까지
 
       ///가게 주변정보 데이터에 담기
@@ -153,7 +164,7 @@ class _CategoryItemState extends State<Category> {
         _text = utf8.decode(response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
         final List<Store> parsedResponse =
-        dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
+            dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
         _datas.clear();
         _datas.addAll(parsedResponse);
         shopes = _datas;
@@ -179,7 +190,7 @@ class _CategoryItemState extends State<Category> {
         _text = utf8.decode(rank_response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
         final List<Store> parsedResponse =
-        dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
+            dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
         _ranks.clear();
         _ranks.addAll(parsedResponse);
         shop_ranks = _ranks;
@@ -187,18 +198,30 @@ class _CategoryItemState extends State<Category> {
       } else {
         print("hi");
       }
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MarkerMapPage(),
+          ));
+
       ///여기까지
 
     } catch (e) {
       throw Exception("정보 가져오기 실패");
     }
+
     ///여기까지
   }
 }
 
 currentLocation currentUser = currentLocation();
+
 ///가게 하나만 담아서 넣어주는 곳
 Shop shop = Shop();
+
+///쓰레기 종류
+String trash = "";
+
 ///가게 전체를 담는 리스트
 List<Store> shopes = [];
 List<Store> shop_ranks = [];
@@ -210,14 +233,14 @@ class Shop {
   String shopNumber = "전화번호";
   bool shopIsOpen = false;
   int shopPoint = 0;
-  List<int> shopLocation = [0, 0];
+  List<double> shopLocation = [0, 0];
   List<bool> trashFlag = [false, false, false, false];
 }
 
 ///가게 위치 리스트 받는부분
 class ShopLocation {
-  late int lng;
-  late int lat;
+  late double lng;
+  late double lat;
 
   ShopLocation({required this.lng, required this.lat});
 
@@ -271,12 +294,12 @@ class Store {
 
   Store(
       {required this.shopName,
-        required this.shopAddress,
-        required this.shopNumber,
-        required this.shopIsOpen,
-        required this.shopPoint,
-        required this.shopLocation,
-        required this.trashType});
+      required this.shopAddress,
+      required this.shopNumber,
+      required this.shopIsOpen,
+      required this.shopPoint,
+      required this.shopLocation,
+      required this.trashType});
 
   factory Store.fromJson(Map<String, dynamic> json) {
     shop.shopIsOpen = json['SHOP_IS_OPEN'];
@@ -295,17 +318,17 @@ class Store {
   }
 
   Map<String, dynamic> toJson() => {
-    'SHOP_NAME': shopName,
-    'SHOP_ADDRESS': shopAddress,
-    'ID_AUX': shopNumber,
-    'SHOP_IS_OPEN': shopIsOpen,
-    'SHOP_POINT': shopPoint,
-    'TRASH_TYPE': trashType,
-    'SHOP_LOCATION': shopLocation
-  };
+        'SHOP_NAME': shopName,
+        'SHOP_ADDRESS': shopAddress,
+        'ID_AUX': shopNumber,
+        'SHOP_IS_OPEN': shopIsOpen,
+        'SHOP_POINT': shopPoint,
+        'TRASH_TYPE': trashType,
+        'SHOP_LOCATION': shopLocation
+      };
 }
 
-class currentLocation{
+class currentLocation {
   String lat = "";
   String lng = "";
 }
