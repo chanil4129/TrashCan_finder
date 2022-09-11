@@ -47,6 +47,13 @@ class _ClientDrawerState extends State<ClientDrawer> {
                     CupertinoPageRoute(builder: (context)=>Admin())
                 );
               },
+            ),
+            ListTile(
+              title: Text('로그아웃'),
+              onTap: () {
+                Navigator.pop(context);
+                logout();
+              },
             )
           ],
         ),
@@ -103,15 +110,27 @@ class _ClientDrawerState extends State<ClientDrawer> {
     });
   }
 
-  void logout() {
-    setState(() {
+  void logout() async{
+    // ?REQ=api_LOGOUT
+    String _UriInfo='http://52.79.202.39/?REQ=api_LOGOUT';
+    final url=Uri.parse(_UriInfo);
+    final response = await http.get(url);
 
-    });
+    print('isLogin Response status: ${response.statusCode}');
+    print('isLogin Response body: ${response.body}');
+
+    MemberInfo.mislogin=false;
+    MemberInfo.UserID='';
+    MemberInfo.Category='';
+    MemberInfo.PhoneNum='';
+
+    showToast('로그아웃 완료');
+
+    runApp(const MyApp());
   }
 
   Future<bool> isLogin() async{
     String _UriInfo='http://52.79.202.39/?REQ=api_LOGIN&USER_ID=${_myHomePage.userid}&USER_PW=${_myHomePage.userpw}';
-    print(_UriInfo);
     final url=Uri.parse(_UriInfo);
     final response = await http.get(url);
 
@@ -132,28 +151,5 @@ class _ClientDrawerState extends State<ClientDrawer> {
     return true;
   }
 
-
-
-  // void loginInfo() async{
-  //   // String _UriInfo='http://52.79.202.39/?REQ=api_LOGIN&USER_ID=${_myHomePage.userid}&USER_PW=${_myHomePage.userpw}';
-  // }
 }
 
-// class getInfo{
-//   final String phoneNum;
-//   final String category;
-//
-//   getInfo({required this.phoneNum,required this.category});
-//
-//   factory getInfo.fromJson(Map<String,dynamic> json){
-//     return getInfo(
-//       phoneNum: json['ID_AUX'] as String,
-//       category: json['CATEGORY'] as String,
-//     );
-//   }
-// }
-//
-// List<getInfo> parseInfo(String responseBody){
-//   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-//   return parsed.map<getInfo>((json)=>getInfo.fromJson(json)).toList();
-// }
