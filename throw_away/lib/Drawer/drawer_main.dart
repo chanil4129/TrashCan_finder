@@ -1,4 +1,9 @@
+import 'dart:convert';
 import 'dart:math';
+import 'dart:convert';
+import 'dart:async';
+import 'package:flutter/foundation.dart';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -23,18 +28,19 @@ class _ClientDrawerState extends State<ClientDrawer> {
   @override
   Widget build(BuildContext context) {
     if (MemberInfo.mislogin) {
+    // if(false){
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              child: Text('회원정보'),
+              child: Text(MemberInfo.UserID),
               decoration: BoxDecoration(
                 color: Color.fromARGB(255, 248, 181, 0),
               ),
             ),
             ListTile(
-              title: Text('bluehill'),
+              title: Text('관리'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -87,6 +93,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
     Future<bool> _future=isLogin();
 
     _future.then((val){
+      MemberInfo.UserID=_myHomePage.userid;
       Navigator.pop(context,true);
       showToast('로그인 성공');
       MemberInfo.mislogin=true;
@@ -112,12 +119,41 @@ class _ClientDrawerState extends State<ClientDrawer> {
     print('isLogin Response status: ${response.statusCode}');
     print('isLogin Response body: ${response.body}');
 
+    // Map<String,dynamic> parseInfo=jsonDecode(response.body);
+    // MemberInfo.PhoneNum=parseInfo['ID_AUX'];
+    // MemberInfo.Category=parseInfo['CATEGORY'];
+    //
+    // print('asdfas'+MemberInfo.PhoneNum);
+    // print('asdfas'+MemberInfo.Category);
+
+
     if(!response.body.contains('ID_MAIN')) throw 'error';
 
     return true;
   }
 
+
+
   // void loginInfo() async{
   //   // String _UriInfo='http://52.79.202.39/?REQ=api_LOGIN&USER_ID=${_myHomePage.userid}&USER_PW=${_myHomePage.userpw}';
   // }
 }
+
+// class getInfo{
+//   final String phoneNum;
+//   final String category;
+//
+//   getInfo({required this.phoneNum,required this.category});
+//
+//   factory getInfo.fromJson(Map<String,dynamic> json){
+//     return getInfo(
+//       phoneNum: json['ID_AUX'] as String,
+//       category: json['CATEGORY'] as String,
+//     );
+//   }
+// }
+//
+// List<getInfo> parseInfo(String responseBody){
+//   final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+//   return parsed.map<getInfo>((json)=>getInfo.fromJson(json)).toList();
+// }
