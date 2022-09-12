@@ -171,7 +171,7 @@ class _UserSignUpState extends State<UserSignUp> {
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   // border: OutlineInputBorder(),
-                    labelText: '01012345678'),
+                    labelText: 'ex) 01012345678'),
               ),
             ),
             Container(
@@ -292,7 +292,7 @@ class _ShopSignUpState extends State<ShopSignUp> {
                 keyboardType: TextInputType.phone,
                 decoration: InputDecoration(
                   // border: OutlineInputBorder(),
-                    labelText: '01012345678'),
+                    labelText: 'ex) 01012345678'),
               ),
             ),
 

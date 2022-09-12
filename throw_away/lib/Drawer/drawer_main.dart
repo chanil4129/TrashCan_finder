@@ -27,7 +27,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    if (MemberInfo.mislogin) {
+    if (MemberInfo.mislogin&&MemberInfo.Category=='SHOP') {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -58,7 +58,30 @@ class _ClientDrawerState extends State<ClientDrawer> {
           ],
         ),
       );
-    } else {
+    }
+    else if(MemberInfo.mislogin&&MemberInfo.Category=='USER') {
+      return Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              child: Text(MemberInfo.UserID),
+              decoration: BoxDecoration(
+                color: Color.fromARGB(255, 248, 181, 0),
+              ),
+            ),
+            ListTile(
+              title: Text('로그아웃'),
+              onTap: () {
+                Navigator.pop(context);
+                logout();
+              },
+            )
+          ],
+        ),
+      );
+    }
+    else {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
