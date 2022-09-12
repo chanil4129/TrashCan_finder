@@ -21,7 +21,7 @@ class _NaverMapUserState extends State<NaverMap_User> {
       body: Container(
         child: NaverMap(
           initialCameraPosition: CameraPosition(
-            target: LatLng(4518299.2954619,14134996.3364428),
+            target: LatLng(4518299.2954619, 14134996.3364428),
             zoom: 17,
           ),
           onMapCreated: onMapCreated,

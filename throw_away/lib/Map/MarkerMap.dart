@@ -1,9 +1,8 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
-import 'package:throw_away_main/Category/CategoryWidget.dart';
+import 'package:throw_away_main/data/Store_data.dart';
 
 class MarkerMapPage extends StatefulWidget {
   @override
@@ -17,36 +16,11 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
   int _currentMode = MODE_NONE;
   List<Store> markerstore = shopes;
 
+  MapType _mapType = MapType.Basic;
+
   Completer<NaverMapController> _controller = Completer();
   List<Marker> _markers = [];
   int i = 1;
-
-  @override
-  void initState() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      OverlayImage.fromAssetImage(assetName: 'icon/marker.png').then((image) {
-        setState(() {
-          markerstore.forEach((store) {
-            _markers.add(Marker(
-                markerId: i.toString(),
-                position: LatLng(store.shopLocation.lat, store.shopLocation.lng),
-                captionText: "커스텀 아이콘",
-                captionColor: Colors.indigo,
-                captionTextSize: 20.0,
-                alpha: 0.8,
-                captionOffset: 30,
-                icon: image,
-                anchor: AnchorPoint(0.5, 1),
-                width: 45,
-                height: 45,
-                onMarkerTab: _onMarkerTap));
-            i++;
-          });
-        });
-      });
-    });
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,17 +43,42 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
       child: Stack(
         children: <Widget>[
           NaverMap(
+            initialCameraPosition: CameraPosition(
+              target: LatLng(currentUser.lat, currentUser.lng),
+              zoom: 17,
+            ),
             onMapCreated: _onMapCreated,
-            onMapTap: _onMapTap,
-            markers: _markers,
-            initLocationTrackingMode: LocationTrackingMode.Follow,
+            markers: markersData(),
+            mapType: _mapType,
           ),
         ],
       ),
     );
   }
 
-  // ================== method ==========================
+  List<Marker> markersData() {
+    try {
+      markerstore.forEach((store) {
+        _markers.add(Marker(
+            markerId: i.toString(),
+            position: LatLng(store.shopLocation.lng, store.shopLocation.lat),
+            captionText: store.shopName,
+            captionColor: Colors.indigo,
+            captionTextSize: 15.0,
+            alpha: 0.8,
+            captionOffset: 30,
+            anchor: AnchorPoint(0.5, 1),
+            width: 20,
+            height: 30,
+            onMarkerTab: _onMarkerTap));
+        i++;
+      });
+    } catch (e) {
+      throw Exception("마커 업데이트 실패");
+    }
+
+    return _markers;
+  }
 
   void _onMapCreated(NaverMapController controller) {
     _controller.complete(controller);
