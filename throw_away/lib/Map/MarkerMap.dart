@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'package:throw_away_main/data/Store_data.dart';
+import 'package:http/http.dart' as http;
 
 class MarkerMapPage extends StatefulWidget {
   @override
@@ -20,7 +22,6 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
 
   Completer<NaverMapController> _controller = Completer();
   List<Marker> _markers = [];
-  int i = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +61,7 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
     try {
       markerstore.forEach((store) {
         _markers.add(Marker(
-            markerId: i.toString(),
+            markerId: store.shopName,
             position: LatLng(store.shopLocation.lng, store.shopLocation.lat),
             captionText: store.shopName,
             captionColor: Colors.indigo,
@@ -71,7 +72,6 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
             width: 20,
             height: 30,
             onMarkerTab: _onMarkerTap));
-        i++;
       });
     } catch (e) {
       throw Exception("마커 업데이트 실패");
@@ -97,14 +97,88 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
   }
 
   void _onMarkerTap(Marker marker, Map<String, int> iconSize) {
-    int pos = _markers.indexWhere((m) => m.markerId == marker.markerId);
-    setState(() {
-      _markers[pos].captionText = '선택됨';
-    });
-    if (_currentMode == MODE_REMOVE) {
-      setState(() {
-        _markers.removeWhere((m) => m.markerId == marker.markerId);
-      });
+    DialogButton(context, marker);
+  }
+
+  void DialogButton(BuildContext context, Marker marker) {
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text(marker.captionText),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Center(child: Text(marker.captionText + "길을 찾겠습니까?"))
+              ],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("길찾기"),
+                onPressed: () {
+                  Get_Directions(marker);
+                },
+              ),
+              new ElevatedButton(
+                child: new Text("취소"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void Get_Directions(Marker marker) async {
+    try {
+      String get_dir = 'http://m.androidapp.naver.com/naverapp';
+      Uri url = Uri.parse(get_dir);
+      http.Response response = await http.get(url);
+      int i =0;
+    }
+    catch(e){
+      throw Exception("gg");
     }
   }
+
+// void Get_Directions(Marker marker) async{
+//   String current_location_data =
+//       currentUser.lng.toString() + ''',''' + currentUser.lat.toString();
+//   String shop_location_data = marker.position.longitude.toString() +
+//       ''',''' +
+//       marker.position.latitude.toString();
+//
+//   String get_dir = "";
+//   get_dir =
+//       'https://naveropenapi.apigw.ntruss.com/map-direction/v1/walking?start=' +
+//           current_location_data +
+//           '&goal=' +
+//           shop_location_data +
+//           '&option=trafast';
+//   // get_dir = 'https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving?start=127.1058342,37.359708&goal=129.075986,35.179470&option=trafast';
+//   Uri url = Uri.parse(get_dir);
+//   http.Response response = await http.get(url, headers: headers);
+//
+//   if (response != null) {
+//     print(json.decode(response.body));
+//   }
+// }
+//
+// Map<String, String> headers = {
+//   'X-NCP-APIGW-API-KEY-ID': 'w0vkkoekke',
+//   'X-NCP-APIGW-API-KEY': 'PVUvKB9pWXTgHFQ4xtCCafvaJNRcne8KpzEjFY8x'
+// };
 }
