@@ -37,6 +37,9 @@ class _LoginState extends State<Login> {
             Padding(
               padding: EdgeInsets.fromLTRB(100, 20, 100, 20),
               child: TextField(
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
                 controller: Login.user_Password,
                 decoration: InputDecoration(
                   // border: OutlineInputBorder(),

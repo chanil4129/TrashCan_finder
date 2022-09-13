@@ -148,6 +148,9 @@ class _UserSignUpState extends State<UserSignUp> {
             Padding(
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextField(
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
                 controller: _UserPwd,
                 decoration: InputDecoration(
                   // border: OutlineInputBorder(),
@@ -269,6 +272,9 @@ class _ShopSignUpState extends State<ShopSignUp> {
             Padding(
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextField(
+                obscureText: true,
+                enableSuggestions: false,
+                autocorrect: false,
                 controller: _ShopPwd,
                 decoration: InputDecoration(
                   // border: OutlineInputBorder(),
