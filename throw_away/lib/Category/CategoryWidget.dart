@@ -38,8 +38,7 @@ class _CategoryItemState extends State<Category> {
                             if (MemberInfo.mislogin) {
                               this.ProgramAccessShopData("GENERAL");
                             } else {
-                              this.ProgramAccessShopData("GENERAL");
-                              //DialogButton(context);
+                              DialogButton(context);
                             }
                           },
                           icon: new Image.asset(

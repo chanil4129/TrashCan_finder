@@ -3,8 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
-import 'package:throw_away_main/data/Store_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
+
+import 'package:throw_away_main/data/Store_data.dart';
 
 class MarkerMapPage extends StatefulWidget {
   @override
@@ -61,7 +63,7 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
     try {
       markerstore.forEach((store) {
         _markers.add(Marker(
-            markerId: store.shopName,
+            markerId: store.shopAddress,
             position: LatLng(store.shopLocation.lng, store.shopLocation.lat),
             captionText: store.shopName,
             captionColor: Colors.indigo,
@@ -144,12 +146,15 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
 
   void Get_Directions(Marker marker) async {
     try {
-      String get_dir = 'http://m.androidapp.naver.com/naverapp';
-      Uri url = Uri.parse(get_dir);
-      http.Response response = await http.get(url);
-      int i =0;
-    }
-    catch(e){
+      String current_location_data =
+          'slat=' + currentUser.lat.toString() + '&slng=' + currentUser.lng.toString();
+      String shop_location_data = '&dlat=' + marker.position.latitude.toString() +
+          '&dlng=' +
+          marker.position.longitude.toString() + '&dname='+ marker.markerId+'&appname=com.example.throw_away_main';
+      String get_dir = 'nmap://route/walk?'+shop_location_data;
+      Uri uri = Uri.parse(get_dir);
+      await launchUrl(uri);
+    } catch (e) {
       throw Exception("gg");
     }
   }
