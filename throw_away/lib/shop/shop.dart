@@ -1,14 +1,19 @@
 import 'dart:math';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:kpostal/kpostal.dart';
+import 'package:remedi_kopo/remedi_kopo.dart';
+import 'package:throw_away_main/data/Store_data.dart';
 
 Shop shop = Shop();
 
 Future<Store> fetchStore(String sa) async {
   final uri = Uri.parse(
-      "http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=${sa}&CATEGORY=SHOP");
+      "http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=$sa&CATEGORY=SHOP");
   var response = await http.get(uri);
 
   if (response.statusCode == 200) {
@@ -72,14 +77,14 @@ Future<bool> postStore(Shop store) async {
 }
 
 class ShopLocation {
-  late double lng;
-  late double lat;
+  double lng;
+  double lat;
 
   ShopLocation({required this.lng, required this.lat});
 
   factory ShopLocation.fromJson(Map<String, dynamic> json) {
-    shop.shopLocation[0] = json['LNG'];
-    shop.shopLocation[1] = json['LAT'];
+    shop.shopLocation[0] = json['LNG'] as double;
+    shop.shopLocation[1] = json['LAT'] as double;
     return ShopLocation(lng: json['LNG'], lat: json['LAT']);
   }
 }
@@ -89,10 +94,10 @@ List<bool> trashFlag = [false, false, false, false];
 bool shopOpen = false;
 
 class TrashType {
-  late bool general;
-  late bool pet;
-  late bool cans;
-  late bool paper;
+  bool general;
+  bool pet;
+  bool cans;
+  bool paper;
 
   TrashType({
     required this.general,
@@ -102,10 +107,10 @@ class TrashType {
   });
 
   factory TrashType.fromJson(Map<String, dynamic> json) {
-    shop.trashFlag[0] = json['GENERAL'];
-    shop.trashFlag[1] = json['PET'];
-    shop.trashFlag[2] = json['CANS'];
-    shop.trashFlag[3] = json['PAPER'];
+    shop.trashFlag[0] = json['GENERAL'] as bool;
+    shop.trashFlag[1] = json['PET'] as bool;
+    shop.trashFlag[2] = json['CANS'] as bool;
+    shop.trashFlag[3] = json['PAPER'] as bool;
     return TrashType(
       general: json['GENERAL'],
       pet: json['PET'],
@@ -120,9 +125,9 @@ class Shop {
   String shopAddress = "주소";
   String shopNumber = "전화번호";
   bool shopIsOpen = false;
-  double shopPoint = 0;
+  int shopPoint = 0;
   bool start = false;
-  List<double> shopLocation = [0, 0];
+  List<double> shopLocation = [0.0, 0.0];
   List<String> trashName = ['일반쓰레기', '플라스틱/페트', '병/캔', '종이/박스'];
   List<bool> trashFlag = [false, false, false, false];
 }
@@ -133,8 +138,8 @@ class Store {
   final String shopNumber;
   final bool shopIsOpen;
   final int shopPoint;
-  final shopLocation;
-  final trashType;
+  final ShopLocation shopLocation;
+  final TrashType trashType;
 
   Store(
       {required this.shopName,
@@ -186,14 +191,15 @@ class _AdminState extends State<Admin> {
   final TextEditingController _shopNameController = TextEditingController();
   final TextEditingController _shopAddressController = TextEditingController();
   final TextEditingController _shopNumberController = TextEditingController();
-
+  final TextEditingController _AddressController = TextEditingController();
+  String addressTmp = '';
+  double latTmp = 0;
+  double lngTmp = 0;
   void _handleSubmitted() {
     _shopNameController.clear();
     _shopAddressController.clear();
     _shopNumberController.clear();
   }
-
-
 
   @override
   void initState() {
@@ -229,21 +235,12 @@ class _AdminState extends State<Admin> {
                             future: store,
                             builder:
                                 (BuildContext context, AsyncSnapshot snapshot) {
-                              if (snapshot.hasError) {
-                                return Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'Error: ${snapshot.error}',
-                                    style: TextStyle(fontSize: 15),
-                                  ),
-                                );
-                              } else {
                                 return Text('적립금: ${shop.shopPoint}',
                                     style: TextStyle(
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold));
                               }
-                            })
+                            )
                       ],
                     ),
                   ],
@@ -401,24 +398,6 @@ class _AdminState extends State<Admin> {
                                                                           Padding(
                                                                             padding: const EdgeInsets.all(8.0),
                                                                             child: TextField(
-                                                                              controller: _shopAddressController,
-                                                                              decoration: InputDecoration(
-                                                                                  labelText: "주소",
-                                                                                  hintText: shop.shopAddress,
-                                                                                  filled : true,
-                                                                                  fillColor: Colors.white60,
-                                                                                  border: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                                                  )
-                                                                              ),
-                                                                              onSubmitted: (String value) {
-                                                                                //_shopAddressController.clear();
-                                                                              },
-                                                                            ),
-                                                                          ),
-                                                                          Padding(
-                                                                            padding: const EdgeInsets.all(8.0),
-                                                                            child: TextField(
                                                                               controller: _shopNumberController,
                                                                               decoration: InputDecoration(
                                                                                   labelText: "전화번호",
@@ -433,11 +412,58 @@ class _AdminState extends State<Admin> {
                                                                                 // _shopNumberController.clear();
                                                                               },
                                                                             ),
-                                                                          )
+                                                                          ),
+                                                                          Padding(
+                                                                            padding: const EdgeInsets.all(8.0),
+                                                                            child: TextField(
+                                                                              readOnly: true,
+                                                                              controller: _shopAddressController,
+                                                                              decoration: InputDecoration(
+                                                                                  labelText: "주소",
+                                                                                  hintText: shop.shopAddress,
+                                                                                  filled : true,
+                                                                                  fillColor: Colors.white60,
+                                                                                  border: OutlineInputBorder(
+                                                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                                                  )
+                                                                              ),
+                                                                              onSubmitted: (String value) {
+                                                                                // _shopNumberController.clear();
+                                                                              },
+                                                                            ),
+                                                                          ),
                                                                         ],
                                                                       ),
                                                                     ),
                                                                     actions :[
+                                                                      TextButton(
+                                                                        onPressed: () async {
+                                                                          await Navigator.push(context,
+                                                                              MaterialPageRoute(
+                                                                                  builder: (_)=>KpostalView(
+                                                                                    useLocalServer: true,
+                                                                                    localPort: 8080,
+                                                                                    kakaoKey: '9dffb1243d85c0a676664e8098149340',
+                                                                                    callback: (Kpostal result){
+                                                                                      setState(() {
+                                                                                        addressTmp = result.address;
+                                                                                        lngTmp = result.kakaoLongitude as double;
+                                                                                        latTmp = result.kakaoLatitude as double;
+                                                                                        //print(shop.shopAddress);
+                                                                                        //print(shop.shopLocation[0]);
+                                                                                        //print(shop.shopLocation[1]);
+                                                                                      });
+                                                                                    },
+                                                                                  )));
+                                                                        },
+                                                                        style: ButtonStyle(
+                                                                          backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                                                                        ),
+                                                                        child: Text(
+                                                                          '주소 검색',
+                                                                          style: TextStyle(color: Colors.white60),
+                                                                        ),
+                                                                      ),
                                                                       ElevatedButton(onPressed: (){
                                                                         if(_shopNameController.text != ''){
                                                                           shop.shopName = _shopNameController.text;
@@ -454,7 +480,15 @@ class _AdminState extends State<Admin> {
                                                                             setState((){
                                                                               shop.shopName = shop.shopName;
                                                                               shop.shopNumber = shop.shopNumber;
-                                                                              shop.shopAddress = shop.shopAddress;
+                                                                              if(addressTmp != ' '){
+                                                                                shop.shopAddress = addressTmp;
+                                                                                addressTmp = '';
+                                                                                shop.shopLocation[0] = lngTmp;
+                                                                                shop.shopLocation[1] = latTmp;
+                                                                                lngTmp = latTmp = 0;
+                                                                              }else {
+                                                                                shop.shopAddress = shop.shopAddress;
+                                                                              }
                                                                             }),
                                                                             ScaffoldMessenger.of(context).showSnackBar(
                                                                               SnackBar(
@@ -512,15 +546,7 @@ class _AdminState extends State<Admin> {
                                   future: store,
                                   builder:
                                       (BuildContext context, AsyncSnapshot snapshot) {
-                                    if (snapshot.hasError) {
-                                      return Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          'Error: ${snapshot.error}',
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      );
-                                    } else {
+
                                       return Expanded(
                                         child: ListView.separated(
                                           padding: const EdgeInsets.all(5),
@@ -574,7 +600,7 @@ class _AdminState extends State<Admin> {
                                               ),
                                         ),
                                       );
-                                    }
+
                                   }),
                               Expanded(
                                 child: Container(
