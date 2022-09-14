@@ -204,7 +204,7 @@ class _CategoryItemState extends State<Category> {
 
     } catch (e) {
       throw Exception("정보 가져오기 실패");
-      NoneCountShope;
+      //NoneCountShope;
     }
 
     ///여기까지
