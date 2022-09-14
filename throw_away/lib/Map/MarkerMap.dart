@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:naver_map_plugin/naver_map_plugin.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import 'package:throw_away_main/data/Store_data.dart';
 
 class MarkerMapPage extends StatefulWidget {
@@ -10,17 +13,12 @@ class MarkerMapPage extends StatefulWidget {
 }
 
 class _MarkerMapPageState extends State<MarkerMapPage> {
-  static const MODE_ADD = 0xF1;
-  static const MODE_REMOVE = 0xF2;
-  static const MODE_NONE = 0xF3;
-  int _currentMode = MODE_NONE;
-  List<Store> markerstore = shopes;
+  List<U_Store> markerstore = shopes;
 
   MapType _mapType = MapType.Basic;
 
   Completer<NaverMapController> _controller = Completer();
   List<Marker> _markers = [];
-  int i = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +30,9 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
         body: Column(
           children: <Widget>[
             _naverMap(),
+            // Expanded(
+            //   child: _Rank_List(),
+            // )
           ],
         ),
       ),
@@ -60,9 +61,9 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
     try {
       markerstore.forEach((store) {
         _markers.add(Marker(
-            markerId: i.toString(),
+            markerId: store.shopAddress,
             position: LatLng(store.shopLocation.lng, store.shopLocation.lat),
-            captionText: store.shopName,
+            captionText: store.shopIsOpen ? store.shopName : "영업준비중",
             captionColor: Colors.indigo,
             captionTextSize: 15.0,
             alpha: 0.8,
@@ -71,7 +72,6 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
             width: 20,
             height: 30,
             onMarkerTab: _onMarkerTap));
-        i++;
       });
     } catch (e) {
       throw Exception("마커 업데이트 실패");
@@ -84,27 +84,110 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
     _controller.complete(controller);
   }
 
-  void _onMapTap(LatLng latLng) {
-    if (_currentMode == MODE_ADD) {
-      _markers.add(Marker(
-        markerId: DateTime.now().toIso8601String(),
-        position: latLng,
-        infoWindow: '테스트',
-        onMarkerTab: _onMarkerTap,
-      ));
-      setState(() {});
+  void _onMarkerTap(Marker marker, Map<String, int> iconSize) {
+    if (marker.captionText.contains("영업준비중")) {
+      AlreadyStore(context, marker);
+    } else {
+      DialogButton(context, marker);
     }
   }
 
-  void _onMarkerTap(Marker marker, Map<String, int> iconSize) {
-    int pos = _markers.indexWhere((m) => m.markerId == marker.markerId);
-    setState(() {
-      _markers[pos].captionText = '선택됨';
-    });
-    if (_currentMode == MODE_REMOVE) {
-      setState(() {
-        _markers.removeWhere((m) => m.markerId == marker.markerId);
-      });
+  void AlreadyStore(BuildContext context, Marker marker) {
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text(marker.captionText),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[Center(child: Text("영업준비중입니다."))],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void DialogButton(BuildContext context, Marker marker) {
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text(marker.captionText),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Center(child: Text(marker.captionText + "길을 찾겠습니까?"))
+              ],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("길찾기"),
+                onPressed: () {
+                  Get_Directions(marker);
+                },
+              ),
+              new ElevatedButton(
+                child: new Text("취소"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void Get_Directions(Marker marker) async {
+    try {
+      Navigator.pop(context);
+      String current_location_data = 'slat=' +
+          currentUser.lat.toString() +
+          '&slng=' +
+          currentUser.lng.toString();
+      String shop_location_data = '&dlat=' +
+          marker.position.latitude.toString() +
+          '&dlng=' +
+          marker.position.longitude.toString() +
+          '&dname=' +
+          marker.markerId +
+          '&appname=com.example.throw_away_main';
+      String get_dir = 'nmap://route/walk?' + shop_location_data;
+      Uri uri = Uri.parse(get_dir);
+      await launchUrl(uri);
+
+    } catch (e) {
+      throw Exception("gg");
     }
   }
 }

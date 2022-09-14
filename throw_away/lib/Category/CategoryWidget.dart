@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:throw_away_main/Map/MarkerMap.dart';
 import 'package:throw_away_main/data/Store_data.dart';
+import 'package:throw_away_main/data/login_data.dart';
 
 class Category extends StatefulWidget {
   const Category({Key? key}) : super(key: key);
@@ -34,7 +35,11 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'General',
                           onPressed: () {
-                            this.ProgramAccessShopData("GENERAL");
+                            if (MemberInfo.mislogin) {
+                              this.ProgramAccessShopData("GENERAL");
+                            } else {
+                              DialogButton(context);
+                            }
                           },
                           icon: new Image.asset(
                               'myasset/myimage/general_waste.png'),
@@ -48,7 +53,11 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'pet',
                           onPressed: () {
-                            this.ProgramAccessShopData("PET");
+                            if (MemberInfo.mislogin) {
+                              this.ProgramAccessShopData("PET");
+                            } else {
+                              DialogButton(context);
+                            }
                           },
                           icon: new Image.asset('myasset/myimage/plastic.png'),
                           label: Text('플라스틱'),
@@ -61,7 +70,11 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'cans',
                           onPressed: () {
-                            this.ProgramAccessShopData("CANS");
+                            if (MemberInfo.mislogin) {
+                              this.ProgramAccessShopData("CANS");
+                            } else {
+                              DialogButton(context);
+                            }
                           },
                           icon: new Image.asset('myasset/myimage/can.png'),
                           label: Text('캔'),
@@ -74,7 +87,11 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'paper',
                           onPressed: () {
-                            this.ProgramAccessShopData("PAPER");
+                            if (MemberInfo.mislogin) {
+                              this.ProgramAccessShopData("PAPER");
+                            } else {
+                              DialogButton(context);
+                            }
                           },
                           icon: new Image.asset(
                               'myasset/myimage/glass_bottle.png'),
@@ -94,33 +111,29 @@ class _CategoryItemState extends State<Category> {
   Future<void> ProgramAccessShopData(String trashType) async {
     ///위치 받아오는값
     Location location = new Location();
+    shopes = [];
 
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
     LocationData _locationData;
     trash = trashType;
-    try {
-
-      _serviceEnabled = await location.serviceEnabled();
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
-        _serviceEnabled = await location.requestService();
-        if (!_serviceEnabled) {
-          return null;
-        }
+        return null;
       }
+    }
 
-      _permissionGranted = await location.hasPermission();
-      if (_permissionGranted == PermissionStatus.denied) {
-        _permissionGranted = await location.requestPermission();
-        if (_permissionGranted != PermissionStatus.granted) {
-          return null;
-        }
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return null;
       }
-      _locationData = await location.getLocation();
     }
-    catch(e){
+    _locationData = await location.getLocation();
 
-    }
     ///여기까지
 
     ///주변 가게정보들 서버에 요청
@@ -134,16 +147,15 @@ class _CategoryItemState extends State<Category> {
         currentUser.lng = 126.92;
       } else {
         ///다시 살려야됨
-        // current_location = '''{"LNG":''' +
-        //     _locationData.longitude.toString() +
-        //     ''',"LAT":''' +
-        //     _locationData.latitude.toString() +
-        //     '''}''';
-        //
-        // currentUser.lat = _locationData.latitude;
-        // currentUser.lng = _locationData.longitude;
-      }
+        current_location = '''{"LNG":''' +
+            _locationData.latitude.toString() +
+            ''',"LAT":''' +
+            _locationData.longitude.toString() +
+            '''}''';
 
+        currentUser.lat = double.parse(_locationData.latitude.toString());
+        currentUser.lng = double.parse(_locationData.longitude.toString());
+      }
 
       String geturl =
           'http://52.79.202.39/?REQ=post_GET_NEAR_SHOP&CUR_LOCATION=' +
@@ -157,7 +169,7 @@ class _CategoryItemState extends State<Category> {
       ///여기까지
 
       ///가게 주변정보 데이터에 담기
-      List<Store> _datas = [];
+      List<U_Store> _datas = [];
       var _text = "";
       http.Response response = await http.get(url);
 
@@ -165,8 +177,8 @@ class _CategoryItemState extends State<Category> {
         print(json.decode(response.body));
         _text = utf8.decode(response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
-        final List<Store> parsedResponse =
-            dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
+        final List<U_Store> parsedResponse =
+        dataObjsJson.map((dataJson) => U_Store.fromJson(dataJson)).toList();
         _datas.clear();
         _datas.addAll(parsedResponse);
         shopes = _datas;
@@ -176,163 +188,103 @@ class _CategoryItemState extends State<Category> {
       }
 
       ///가게 랭킹
-      String rankurl =
-          'http://52.79.202.39/?REQ=post_GET_SHOP_RANK&CUR_LOCATION=' +
-              current_location +
-              '&CATEGORY=' +
-              'SHOP';
-      Uri rank = Uri.parse(rankurl);
-
-      List<Store> _ranks = [];
-      _text = "";
-      http.Response rank_response = await http.get(rank);
-
-      if (rank_response != null) {
-        print(json.decode(rank_response.body));
-        _text = utf8.decode(rank_response.bodyBytes);
-        var dataObjsJson = jsonDecode(_text) as List;
-        final List<Store> parsedResponse =
-            dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
-        _ranks.clear();
-        _ranks.addAll(parsedResponse);
-        shop_ranks = _ranks;
-        print(parsedResponse);
-      } else {
-        print("hi");
+      if(_datas.length>0){
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MarkerMapPage(),
+            ));
       }
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MarkerMapPage(),
-          ));
+      else{
+        NoneCountShope;
+      }
+
 
       ///여기까지
 
     } catch (e) {
       throw Exception("정보 가져오기 실패");
+      //NoneCountShope;
     }
 
     ///여기까지
   }
+
+  void DialogButton(BuildContext context) {
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text("비로그인"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "로그인 후 이용 부탁드립니다.",
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("확인"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
+
+  void NoneCountShope(BuildContext context){
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text("가게탐색 실패"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Center(
+                  child: Text("주변에 검색된 가게가 업습니다."),
+                )
+              ],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        }
+    );
+  }
 }
-
-// currentLocation currentUser = currentLocation();
-//
-// ///가게 하나만 담아서 넣어주는 곳
-// Shop shop = Shop();
-//
-// ///쓰레기 종류
-// String trash = "";
-//
-// ///가게 전체를 담는 리스트
-// List<Store> shopes = [];
-// List<Store> shop_ranks = [];
-//
-// ///개개인 가게 정보 클래스
-// class Shop {
-//   String shopName = "가게명";
-//   String shopAddress = "주소";
-//   String shopNumber = "전화번호";
-//   bool shopIsOpen = false;
-//   int shopPoint = 0;
-//   List<double> shopLocation = [0, 0];
-//   List<bool> trashFlag = [false, false, false, false];
-// }
-//
-// ///가게 위치 리스트 받는부분
-// class ShopLocation {
-//   late double lng;
-//   late double lat;
-//
-//   ShopLocation({required this.lng, required this.lat});
-//
-//   factory ShopLocation.fromJson(Map<String, dynamic> json) {
-//     shop.shopLocation[0] = json['LNG'];
-//     shop.shopLocation[1] = json['LAT'];
-//     return ShopLocation(lng: json['LNG'], lat: json['LAT']);
-//   }
-// }
-//
-// List<bool> trashFlag = [false, false, false, false];
-// bool shopOpen = false;
-//
-// ///카테고리 종류 받는 부분
-// class TrashType {
-//   late bool general;
-//   late bool pet;
-//   late bool cans;
-//   late bool paper;
-//
-//   TrashType({
-//     required this.general,
-//     required this.pet,
-//     required this.cans,
-//     required this.paper,
-//   });
-//
-//   factory TrashType.fromJson(Map<String, dynamic> json) {
-//     shop.trashFlag[0] = json['GENERAL'];
-//     shop.trashFlag[1] = json['PET'];
-//     shop.trashFlag[2] = json['CANS'];
-//     shop.trashFlag[3] = json['PAPER'];
-//     return TrashType(
-//       general: json['GENERAL'],
-//       pet: json['PET'],
-//       cans: json['CANS'],
-//       paper: json['PAPER'],
-//     );
-//   }
-// }
-//
-// ///전체적으로 가게 모든 데이터를 받는 부분
-// class Store {
-//   final String shopName;
-//   final String shopAddress;
-//   final String shopNumber;
-//   final bool shopIsOpen;
-//   final int shopPoint;
-//   final ShopLocation shopLocation;
-//   final TrashType trashType;
-//
-//   Store(
-//       {required this.shopName,
-//       required this.shopAddress,
-//       required this.shopNumber,
-//       required this.shopIsOpen,
-//       required this.shopPoint,
-//       required this.shopLocation,
-//       required this.trashType});
-//
-//   factory Store.fromJson(Map<String, dynamic> json) {
-//     shop.shopIsOpen = json['SHOP_IS_OPEN'];
-//     shop.shopName = json['SHOP_NAME'];
-//     shop.shopAddress = json['SHOP_ADDRESS'];
-//     shop.shopNumber = json['ID_AUX'];
-//     shop.shopPoint = json['SHOP_POINT'];
-//     return Store(
-//         shopName: json['SHOP_NAME'],
-//         shopAddress: json['SHOP_ADDRESS'],
-//         shopNumber: json['ID_AUX'],
-//         shopIsOpen: json['SHOP_IS_OPEN'],
-//         shopPoint: json['SHOP_POINT'],
-//         shopLocation: ShopLocation.fromJson(json['SHOP_LOCATION']),
-//         trashType: TrashType.fromJson(json['TRASH_TYPE']));
-//   }
-//
-//   Map<String, dynamic> toJson() => {
-//         'SHOP_NAME': shopName,
-//         'SHOP_ADDRESS': shopAddress,
-//         'ID_AUX': shopNumber,
-//         'SHOP_IS_OPEN': shopIsOpen,
-//         'SHOP_POINT': shopPoint,
-//         'TRASH_TYPE': trashType,
-//         'SHOP_LOCATION': shopLocation
-//       };
-// }
-//
-// class currentLocation {
-//   String lat = "";
-//   String lng = "";
-// }
-
-final bool TestMode = true;

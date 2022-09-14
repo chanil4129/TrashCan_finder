@@ -40,8 +40,7 @@ dependencies:
   naver_map_plugin: ^0.9.6
   location: ^4.2.0
   geolocator: ^9.0.1
-  remedi_kopo: ^0.0.1
-  kpostal: ^0.5.1
+
 
 dev_dependencies:
   flutter_test:
