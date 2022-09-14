@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:kpostal/kpostal.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 //회원가입 확인
@@ -230,6 +231,9 @@ class _ShopSignUpState extends State<ShopSignUp> {
   final _ShopName=TextEditingController();
   final _ShopAddress=TextEditingController();
 
+  String address = '';
+  double lng = 0;
+  double lat = 0;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -333,14 +337,37 @@ class _ShopSignUpState extends State<ShopSignUp> {
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: TextField(
-                controller: _ShopAddress,
-                decoration: InputDecoration(
-                  // border: OutlineInputBorder(),
-                    labelText: '주소를 입력하세요'),
+              child: TextButton(
+                onPressed: () async {
+                  await Navigator.push(context,
+                      MaterialPageRoute(
+                          builder: (_)=>KpostalView(
+                            useLocalServer: true,
+                            localPort: 8080,
+                            kakaoKey: '9dffb1243d85c0a676664e8098149340',
+                            callback: (Kpostal result){
+                              setState(() {
+                                print(result);
+                                address = result.address;
+                                lng = result.kakaoLongitude as double;
+                                lat = result.kakaoLatitude as double;
+                              });
+                            },
+                          )));
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                ),
+                child: Text(
+                  '주소 검색',
+                  style: TextStyle(color: Colors.white60),
+                ),
               ),
             ),
-
+            Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: Text(address)
+            ),
 
             Container(
                 alignment: Alignment.centerRight,
@@ -370,7 +397,7 @@ class _ShopSignUpState extends State<ShopSignUp> {
     final url=Uri.parse(_UriInfo);
     final response = await http.get(url);
 
-    String _UriInfoAdd='http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${_ShopPn.text}&CATEGORY=SHOP&JSON_UPDATE={"SHOP_NAME":"${_ShopName.text}","SHOP_ADDRESS":"${_ShopAddress.text}","SHOP_NUMBER":"00000000000","SHOP_IS_OPEN":${false},"SHOP_POINT":${0},"SHOP_LOCATION":{"LNG":${126.916764977433},"LAT":${37.5492271696503}},"TRASH_TYPE":{"GENERAL":${false},"PET":${false},"CANS":${false},"PAPER":${false}}}';
+    String _UriInfoAdd='http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${_ShopPn.text}&CATEGORY=SHOP&JSON_UPDATE={"SHOP_NAME":"${_ShopName.text}","SHOP_ADDRESS":"$address","SHOP_NUMBER":"00000000000","SHOP_IS_OPEN":${false},"SHOP_POINT":${0},"SHOP_LOCATION":{"LNG":$lng,"LAT":$lat},"TRASH_TYPE":{"GENERAL":${false},"PET":${false},"CANS":${false},"PAPER":${false}}}';
     final urlAdd=Uri.parse(_UriInfoAdd);
     final responseAdd=await http.post(urlAdd);
     print('Response status: ${responseAdd.statusCode}');
