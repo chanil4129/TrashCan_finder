@@ -111,6 +111,7 @@ class _CategoryItemState extends State<Category> {
   Future<void> ProgramAccessShopData(String trashType) async {
     ///위치 받아오는값
     Location location = new Location();
+    shopes = [];
 
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
@@ -168,7 +169,7 @@ class _CategoryItemState extends State<Category> {
       ///여기까지
 
       ///가게 주변정보 데이터에 담기
-      List<Store> _datas = [];
+      List<U_Store> _datas = [];
       var _text = "";
       http.Response response = await http.get(url);
 
@@ -176,8 +177,8 @@ class _CategoryItemState extends State<Category> {
         print(json.decode(response.body));
         _text = utf8.decode(response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
-        final List<Store> parsedResponse =
-            dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
+        final List<U_Store> parsedResponse =
+        dataObjsJson.map((dataJson) => U_Store.fromJson(dataJson)).toList();
         _datas.clear();
         _datas.addAll(parsedResponse);
         shopes = _datas;
@@ -187,40 +188,23 @@ class _CategoryItemState extends State<Category> {
       }
 
       ///가게 랭킹
-      String rankurl =
-          'http://52.79.202.39/?REQ=post_GET_SHOP_RANK&CUR_LOCATION=' +
-              current_location +
-              '&CATEGORY=' +
-              'SHOP';
-      Uri rank = Uri.parse(rankurl);
-
-      List<Store> _ranks = [];
-      _text = "";
-      http.Response rank_response = await http.get(rank);
-
-      if (rank_response != null) {
-        print(json.decode(rank_response.body));
-        _text = utf8.decode(rank_response.bodyBytes);
-        var dataObjsJson = jsonDecode(_text) as List;
-        final List<Store> parsedResponse =
-            dataObjsJson.map((dataJson) => Store.fromJson(dataJson)).toList();
-        _ranks.clear();
-        _ranks.addAll(parsedResponse);
-        shop_ranks = _ranks;
-        print(parsedResponse);
-      } else {
-        print("hi");
+      if(_datas.length>0){
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MarkerMapPage(),
+            ));
       }
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => MarkerMapPage(),
-          ));
+      else{
+        NoneCountShope;
+      }
+
 
       ///여기까지
 
     } catch (e) {
       throw Exception("정보 가져오기 실패");
+      NoneCountShope;
     }
 
     ///여기까지
@@ -261,8 +245,46 @@ class _CategoryItemState extends State<Category> {
               ),
             ],
           );
-        });
+        }
+    );
+  }
+
+  void NoneCountShope(BuildContext context){
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text("가게탐색 실패"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Center(
+                  child: Text("주변에 검색된 가게가 업습니다."),
+                )
+              ],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("닫기"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        }
+    );
   }
 }
-
-final bool TestMode = false;
