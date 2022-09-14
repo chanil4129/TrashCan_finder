@@ -3,6 +3,8 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
+import 'package:permission_handler/permission_handler.dart';
+import 'package:app_settings/app_settings.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -51,6 +53,7 @@ class RouteOne extends StatelessWidget {
                   child: Text('QR코드 만들기')),
               ElevatedButton(
                 onPressed: () {
+                  getPermission();
                   Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -62,6 +65,14 @@ class RouteOne extends StatelessWidget {
             ],
           ),
         ));
+  }
+
+  getPermission() async {
+    var status = await Permission.camera.status;
+    if (status.isGranted) {
+    } else if (status.isDenied) {
+      Permission.camera.request();
+    }
   }
 }
 
