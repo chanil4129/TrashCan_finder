@@ -225,9 +225,9 @@ class _ClientDrawerState extends State<ClientDrawer> {
       } else {
         ///다시 살려야됨
         current_location = '''{"LNG":''' +
-            _locationData.latitude.toString() +
-            ''',"LAT":''' +
             _locationData.longitude.toString() +
+            ''',"LAT":''' +
+            _locationData.latitude.toString() +
             '''}''';
 
         currentUser.lat = double.parse(_locationData.latitude.toString());

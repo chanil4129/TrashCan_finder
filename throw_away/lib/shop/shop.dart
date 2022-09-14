@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:kpostal/kpostal.dart';
-import 'package:remedi_kopo/remedi_kopo.dart';
 import 'package:throw_away_main/data/Store_data.dart';
 
-Shop shop = Shop();
 
 Future<Store> fetchStore(String sa) async {
   final uri = Uri.parse(
@@ -28,13 +26,14 @@ Future<Store> fetchStore(String sa) async {
 Future<bool> postStore(Shop store) async {
   final response = await http.post(
     Uri.parse(
-        "http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${store.shopNumber}&CATEGORY=SHOP&JSON_UPDATE="
+        "http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${store.idAux}&CATEGORY=SHOP&JSON_UPDATE="
             "{"
             "\"SHOP_NAME\":\"${store.shopName}\","
             "\"SHOP_ADDRESS\":\"${store.shopAddress}\","
-            "\"ID_AUX\":\"${store.shopNumber}\","
+            //"\"ID_AUX\":\"${store.idAux}\","
             "\"SHOP_IS_OPEN\":${store.shopIsOpen},"
             "\"SHOP_POINT\":${store.shopPoint},"
+            "\"SHOP_NUMBER\":\"${store.shopNumber}\","
             "\"TRASH_TYPE\":{"
             "\"GENERAL\":${store.trashFlag[0]},"
             "\"PET\":${store.trashFlag[1]},"
@@ -52,9 +51,10 @@ Future<bool> postStore(Shop store) async {
     body: jsonEncode(<String, dynamic>{
       'SHOP_NAME': store.shopName,
       'SHOP_ADDRESS': store.shopAddress,
-      'ID_AUX': store.shopNumber,
+      //'ID_AUX': store.idAux,
       'SHOP_IS_OPEN': store.shopIsOpen,
       'SHOP_POINT': store.shopPoint,
+      'SHOP_NUMBER': store.shopNumber,
       'TRASH_TYPE': {
         'GENERAL': store.trashFlag[0],
         'PET': store.trashFlag[1],
@@ -67,6 +67,8 @@ Future<bool> postStore(Shop store) async {
       }
     }),
   );
+  print(response.statusCode);
+  print(shop.idAux);
   if (response.statusCode == 200) {
     print("수정 완료~");
     return true;
@@ -124,6 +126,7 @@ class Shop {
   String shopName = "가게명";
   String shopAddress = "주소";
   String shopNumber = "전화번호";
+  String idAux = '';
   bool shopIsOpen = false;
   int shopPoint = 0;
   bool start = false;
@@ -136,6 +139,7 @@ class Store {
   final String shopName;
   final String shopAddress;
   final String shopNumber;
+  final String idAux;
   final bool shopIsOpen;
   final int shopPoint;
   final ShopLocation shopLocation;
@@ -146,6 +150,7 @@ class Store {
         required this.shopAddress,
         required this.shopNumber,
         required this.shopIsOpen,
+        required this.idAux,
         required this.shopPoint,
         required this.shopLocation,
         required this.trashType});
@@ -154,12 +159,14 @@ class Store {
     shop.shopIsOpen = json['SHOP_IS_OPEN'];
     shop.shopName = json['SHOP_NAME'];
     shop.shopAddress = json['SHOP_ADDRESS'];
-    shop.shopNumber = json['ID_AUX'];
+    shop.shopNumber = json['SHOP_NUMBER'];
     shop.shopPoint = json['SHOP_POINT'];
+    shop.idAux = json['ID_AUX'];
     return Store(
         shopName: json['SHOP_NAME'],
         shopAddress: json['SHOP_ADDRESS'],
-        shopNumber: json['ID_AUX'],
+        idAux: json['ID_AUX'],
+        shopNumber: json['SHOP_NUMBER'],
         shopIsOpen: json['SHOP_IS_OPEN'],
         shopPoint: json['SHOP_POINT'],
         trashType: TrashType.fromJson(json['TRASH_TYPE']),
@@ -169,7 +176,8 @@ class Store {
   Map<String, dynamic> toJson() => {
     'SHOP_NAME': shopName,
     'SHOP_ADDRESS': shopAddress,
-    'ID_AUX': shopNumber,
+    'ID_AUX': idAux,
+    'SHOP_NUMBER': shopNumber,
     'SHOP_IS_OPEN': shopIsOpen,
     'SHOP_POINT': shopPoint,
     'TRASH_TYPE': trashType,
@@ -184,14 +192,14 @@ class Admin extends StatefulWidget {
   @override
   State<Admin> createState() => _AdminState();
 }
-
+Shop shop = Shop();
 class _AdminState extends State<Admin> {
   late Future<Store> store;
-  bool switchFlag = shop.shopIsOpen;
+  //bool switchFlag = shop.shopIsOpen;
   final TextEditingController _shopNameController = TextEditingController();
   final TextEditingController _shopAddressController = TextEditingController();
   final TextEditingController _shopNumberController = TextEditingController();
-  final TextEditingController _AddressController = TextEditingController();
+  //final TextEditingController _AddressController = TextEditingController();
   String addressTmp = '';
   double latTmp = 0;
   double lngTmp = 0;
@@ -446,12 +454,10 @@ class _AdminState extends State<Admin> {
                                                                                     kakaoKey: '9dffb1243d85c0a676664e8098149340',
                                                                                     callback: (Kpostal result){
                                                                                       setState(() {
+                                                                                        print(result);
                                                                                         addressTmp = result.address;
                                                                                         lngTmp = result.kakaoLongitude as double;
                                                                                         latTmp = result.kakaoLatitude as double;
-                                                                                        //print(shop.shopAddress);
-                                                                                        //print(shop.shopLocation[0]);
-                                                                                        //print(shop.shopLocation[1]);
                                                                                       });
                                                                                     },
                                                                                   )));
@@ -468,11 +474,15 @@ class _AdminState extends State<Admin> {
                                                                         if(_shopNameController.text != ''){
                                                                           shop.shopName = _shopNameController.text;
                                                                         }
-                                                                        if(_shopAddressController.text != ''){
-                                                                          shop.shopAddress = _shopAddressController.text;
-                                                                        }
                                                                         if(_shopNumberController.text != ''){
                                                                           shop.shopNumber = _shopNumberController.text;
+                                                                        }
+                                                                        if(addressTmp != ''){
+                                                                          shop.shopAddress = addressTmp;
+                                                                          addressTmp = '';
+                                                                          shop.shopLocation[0] = lngTmp;
+                                                                          shop.shopLocation[1] = latTmp;
+                                                                          lngTmp = latTmp = 0;
                                                                         }
                                                                         postStore(shop)
                                                                             .then((value) => {
@@ -480,15 +490,7 @@ class _AdminState extends State<Admin> {
                                                                             setState((){
                                                                               shop.shopName = shop.shopName;
                                                                               shop.shopNumber = shop.shopNumber;
-                                                                              if(addressTmp != ' '){
-                                                                                shop.shopAddress = addressTmp;
-                                                                                addressTmp = '';
-                                                                                shop.shopLocation[0] = lngTmp;
-                                                                                shop.shopLocation[1] = latTmp;
-                                                                                lngTmp = latTmp = 0;
-                                                                              }else {
-                                                                                shop.shopAddress = shop.shopAddress;
-                                                                              }
+
                                                                             }),
                                                                             ScaffoldMessenger.of(context).showSnackBar(
                                                                               SnackBar(
@@ -602,28 +604,6 @@ class _AdminState extends State<Admin> {
                                       );
 
                                   }),
-                              Expanded(
-                                child: Container(
-                                  margin: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(25),
-                                      // border: Border.all(color: Colors.lightGreen, width: 3),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 5,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 3),
-                                        )
-                                      ]),
-                                  child: Column(
-                                    children: [
-                                      Text("나중에 내역같은거 보여줄까?"),
-                                    ],
-                                  ),
-                                ),
-                              ),
                             ],
                           ),
                         ),

@@ -62,7 +62,7 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
       markerstore.forEach((store) {
         _markers.add(Marker(
             markerId: store.shopAddress,
-            position: LatLng(store.shopLocation.lng, store.shopLocation.lat),
+            position: LatLng(store.shopLocation.lat, store.shopLocation.lng),
             captionText: store.shopIsOpen ? store.shopName : "영업준비중",
             captionColor: Colors.indigo,
             captionTextSize: 15.0,
