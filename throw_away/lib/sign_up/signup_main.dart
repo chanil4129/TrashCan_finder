@@ -370,7 +370,7 @@ class _ShopSignUpState extends State<ShopSignUp> {
     final url=Uri.parse(_UriInfo);
     final response = await http.get(url);
 
-    String _UriInfoAdd='http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${_ShopPn.text}&CATEGORY=SHOP&JSON_UPDATE={"SHOP_NAME":"${_ShopName.text}","SHOP_ADDRESS":"${_ShopAddress.text}"}';
+    String _UriInfoAdd='http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${_ShopPn.text}&CATEGORY=SHOP&JSON_UPDATE={"SHOP_NAME":"${_ShopName.text}","SHOP_ADDRESS":"${_ShopAddress.text}","SHOP_NUMBER":"00000000000","SHOP_IS_OPEN":"false","SHOP_POINT":"0","SHOP_LOCATION":{"LNG":"126.916764977433","LAT":"37.5492271696503"},"TRASH_TYPE":{"GENERAL":"false","PET":"false","CANS":"true","PAPER":"true"}}';
     final urlAdd=Uri.parse(_UriInfoAdd);
     final responseAdd=await http.post(urlAdd);
     print('Response status: ${responseAdd.statusCode}');
