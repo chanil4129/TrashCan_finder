@@ -1,6 +1,6 @@
 currentLocation currentUser = currentLocation();
 
-final bool TestMode = false;
+final bool TestMode = true;
 
 ///가게 하나만 담아서 넣어주는 곳
 U_Shop shop = U_Shop();
