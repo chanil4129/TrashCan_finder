@@ -9,6 +9,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:location/location.dart';
+import 'package:throw_away_main/QR/QR.dart';
 
 import 'package:throw_away_main/main.dart';
 import 'package:throw_away_main/sign_up/signup_main.dart';
@@ -16,6 +17,7 @@ import 'package:throw_away_main/log_in/login_main.dart';
 import 'package:throw_away_main/shop/shop.dart';
 import 'package:throw_away_main/data/login_data.dart';
 import 'package:throw_away_main/data/Store_data.dart';
+import 'package:qr/qr.dart';
 
 class ClientDrawer extends StatefulWidget {
   const ClientDrawer({Key? key}) : super(key: key);
@@ -63,7 +65,14 @@ class _ClientDrawerState extends State<ClientDrawer> {
               onTap: () {
                 Rank();
               },
-            )
+            ),
+            ListTile(
+              title: Text('QR 코드 생성'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: ((context) => QR_InputText())));
+              },
+            ),
           ],
         ),
       );

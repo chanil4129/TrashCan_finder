@@ -45,9 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: Stack(
         children: [
-          Positioned(
-            child: NaverMap_User()
-          ),
+          Positioned(child: NaverMap_User()),
           Container(
             width: double.infinity,
             height: 40,

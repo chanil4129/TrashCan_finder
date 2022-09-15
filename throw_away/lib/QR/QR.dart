@@ -8,6 +8,8 @@ import 'package:app_settings/app_settings.dart';
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:throw_away_main/main.dart';
+
 class QR_View extends StatefulWidget {
   //사용자가 QR코드를 찍기 위해 카메라를 키는 페이지
   const QR_View({Key? key}) : super(key: key);
@@ -76,6 +78,7 @@ class _QRCheckerState extends State<QRChecker> {
   List<bool> _isChecked = [false, false, false, false];
   List<bool> _isButtonDisabled = [false, false, false, false];
   late Uri phoneNum;
+  late int updatePoint;
 
   Future<ShopInfo>? shopInfo;
 
@@ -99,6 +102,7 @@ class _QRCheckerState extends State<QRChecker> {
       _isButtonDisabled[2] = value.TRASH_TYPE.CANS;
       _isButtonDisabled[3] = value.TRASH_TYPE.PAPER;
       phoneNum = Uri.parse('tel:${value.SHOP_NUMBER}');
+      updatePoint = value.SHOP_POINT;
       print('Future value converted!');
     });
   }
@@ -311,9 +315,23 @@ class _QRCheckerState extends State<QRChecker> {
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
+                              if (updateShopPoint() == true) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => MyHomePage()));
+                              }
+                            },
+                            child: Text('제출'),
+                          ),
+                          TextButton(
+                            onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: Text('예, 알겠습니다.'),
+                            child: Text(
+                              '취소',
+                              style: TextStyle(color: Colors.grey),
+                            ),
                           ),
                         ],
                       );
@@ -324,6 +342,49 @@ class _QRCheckerState extends State<QRChecker> {
         ],
       ),
     );
+  }
+
+  Future<bool> updateShopPoint() async {
+    int num = 0;
+    int point = updatePoint;
+
+    for (int i = 0; i < 4; i++) {
+      if (_isChecked[i] == true) num += 1;
+    }
+
+    switch (num) {
+      case 1:
+        point += 5;
+        break;
+      case 2:
+        point += 7;
+        break;
+      case 3:
+        point += 9;
+        break;
+      case 4:
+        point += 10;
+        break;
+    }
+
+    print('Point is' + point.toString());
+
+    final url = Uri.parse(
+        'http://52.79.202.39?REQ=post_PUT_ROOT_INFO&PHONE_NUM=' +
+            widget.mCode.toString() +
+            '&CATEGORY=SHOP&JSON_UPDATE={“SHOP_POINT”:' +
+            point.toString() +
+            '}');
+
+    print('http://52.79.202.39?REQ=post_PUT_ROOT_INFO&PHONE_NUM=' +
+        '01011111111' +
+        '&CATEGORY=SHOP&JSON_UPDATE={“SHOP_POINT”:' +
+        point.toString() +
+        '}');
+
+    final response = await http.get(url);
+
+    return true;
   }
 }
 
@@ -398,5 +459,113 @@ class ShopInfo {
       SHOP_POINT: json['SHOP_POINT'] as int,
       TRASH_TYPE: TRASHTYPE.fromJson(json['TRASH_TYPE']),
     );
+  }
+}
+
+class QR_InputText extends StatefulWidget {
+  const QR_InputText({Key? key}) : super(key: key);
+
+  @override
+  State<QR_InputText> createState() => _QR_InputTextState();
+}
+
+class _QR_InputTextState extends State<QR_InputText> {
+  final TextEditingController _textController = new TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('QR코드 만들기'),
+      ),
+      body: _buildTextComposer(),
+    );
+  }
+
+  Widget _buildTextComposer() {
+    return IconTheme(
+      data: IconThemeData(color: Colors.amberAccent),
+      child: Container(
+          alignment: Alignment(0.0, 0.0),
+          margin: const EdgeInsets.symmetric(horizontal: 8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Flexible(
+                    child: TextField(
+                      controller: _textController,
+                      onSubmitted: _handleSubmitted,
+                      decoration: InputDecoration(
+                        labelText: '가게 전화번호',
+                        hintText: '가게 전화번호를 입력해주세요',
+                        labelStyle: TextStyle(color: Colors.amberAccent),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide:
+                              BorderSide(width: 1, color: Colors.amberAccent),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                          borderSide:
+                              BorderSide(width: 1, color: Colors.amberAccent),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        ),
+                      ),
+                      keyboardType: TextInputType.text,
+                    ),
+                  ),
+                  Container(
+                    margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: IconButton(
+                        icon: Icon(Icons.send),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: ((context) => QRMaker(
+                                        mCode: _textController.text,
+                                      ))));
+                        }),
+                  ),
+                ],
+              ),
+            ],
+          )),
+    );
+  }
+
+  void _handleSubmitted(String text) {
+    _textController.clear();
+  }
+}
+
+class QRMaker extends StatelessWidget {
+  const QRMaker({Key? key, required this.mCode}) : super(key: key);
+
+  final mCode;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text('QR코드 생성기'),
+        ),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              QrImage(
+                //가게용 관리자가 입력한 mCode를 기반으로 QR 이미지 생성
+                data: '${mCode}',
+                size: 200,
+              )
+            ],
+          ),
+        ));
   }
 }
