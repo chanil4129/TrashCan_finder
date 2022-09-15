@@ -31,7 +31,6 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
         body: Column(
           children: <Widget>[
             _naverMap(),
-            //QR_View()
           ],
         ),
       ),
@@ -51,6 +50,18 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
             markers: markersData(),
             mapType: _mapType,
           ),
+          Positioned(
+            child: Container(
+              color: Colors.transparent,
+              width: 100,
+              height: 100,
+              child: QR_View(),
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(8),
+            ),
+            bottom: 0,
+            right: 0,
+          )
         ],
       ),
     );
