@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:throw_away_main/Drawer/drawer_main.dart';
 
 class Login extends StatefulWidget {
-  const Login({Key? key,required this.title,required this.login_onSubmit}) : super(key: key);
+  const Login({Key? key, required this.title, required this.login_onSubmit})
+      : super(key: key);
   final String title;
   final VoidCallback login_onSubmit;
-  static final TextEditingController user_ID=new TextEditingController();
-  static final TextEditingController user_Password=new TextEditingController();
+  static final TextEditingController user_ID = new TextEditingController();
+  static final TextEditingController user_Password =
+      new TextEditingController();
 
-  String get userid=>user_ID.text;
-  String get userpw=>user_Password.text;
+  String get userid => user_ID.text;
+
+  String get userpw => user_Password.text;
 
   @override
   State<Login> createState() => _LoginState();
@@ -20,8 +23,8 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(),
-      body: SingleChildScrollView(
-        child: Center(
+      body: Center(
+        child: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -59,7 +62,7 @@ class _LoginState extends State<Login> {
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }

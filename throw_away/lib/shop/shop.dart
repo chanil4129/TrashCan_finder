@@ -30,7 +30,7 @@ Future<bool> postStore(Shop store) async {
             "{"
             "\"SHOP_NAME\":\"${store.shopName}\","
             "\"SHOP_ADDRESS\":\"${store.shopAddress}\","
-            //"\"ID_AUX\":\"${store.idAux}\","
+        //"\"ID_AUX\":\"${store.idAux}\","
             "\"SHOP_IS_OPEN\":${store.shopIsOpen},"
             "\"SHOP_POINT\":${store.shopPoint},"
             "\"SHOP_NUMBER\":\"${store.shopNumber}\","
@@ -219,398 +219,394 @@ class _AdminState extends State<Admin> {
   }
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
-            appBar: AppBar(
-              title: Row(
-                children: [
-                  Icon(Icons.format_list_bulleted_rounded),
-                ],
-              ),
-              actions: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  //mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Wrap(
-                      spacing: 5,
-                      children: <Widget>[
-                        Icon(
-                          Icons.control_point_duplicate,
-                          color: Colors.blue,
-                        ),
-                        FutureBuilder<Store>(
-                            future: store,
-                            builder:
-                                (BuildContext context, AsyncSnapshot snapshot) {
-                                return Text('적립금: ${shop.shopPoint}',
-                                    style: TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold));
-                              }
-                            )
-                      ],
-                    ),
-                  ],
-                )
+    return Scaffold(
+        appBar: AppBar(
+          actions: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              // mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                  child: Wrap(
+                    spacing: 5,
+                    children: <Widget>[
+                      Icon(
+                        Icons.control_point_duplicate,
+                        color: Colors.blue,
+                      ),
+                      FutureBuilder<Store>(
+                          future: store,
+                          builder:
+                              (BuildContext context, AsyncSnapshot snapshot) {
+                            return Text('적립금: ${shop.shopPoint}',
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold));
+                          }
+                      )
+                    ],
+                  ),
+                ),
               ],
-              backgroundColor: Colors.amber,
-            ),
-            body:
-            FutureBuilder(
-                future: store,
-                builder: (BuildContext context,AsyncSnapshot snapshot) {
-                  shop.start = true;
-                  return Container(
-                    padding: EdgeInsets.all(5),
-                    //margin: EdgeInsets.all(10),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Expanded(
-                                flex: 6,
-                                child: Container(
-                                  margin: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.circular(25),
-                                      // border: Border.all(color: Colors.lightGreen, width: 3),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.5),
-                                          spreadRadius: 5,
-                                          blurRadius: 7,
-                                          offset: Offset(0, 3),
-                                        )
-                                      ]),
-                                  child: Column(
-                                    children: [
-                                      Expanded(
-                                          child: Container(
-                                            margin: const EdgeInsets.all(10),
-                                            child: Column(
+            )
+          ],
+        ),
+        body:
+        FutureBuilder(
+            future: store,
+            builder: (BuildContext context,AsyncSnapshot snapshot) {
+              shop.start = true;
+              return Container(
+                padding: EdgeInsets.all(5),
+                //margin: EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: Container(
+                              margin: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(25),
+                                  // border: Border.all(color: Colors.lightGreen, width: 3),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 5,
+                                      blurRadius: 7,
+                                      offset: Offset(0, 3),
+                                    )
+                                  ]),
+                              child: Column(
+                                children: [
+                                  Expanded(
+                                      child: Container(
+                                        margin: const EdgeInsets.all(10),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(
+                                                  shop.shopName,
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 20),
+                                                ),
+                                                ElevatedButton(
+                                                    onPressed: () {
+                                                      postStore(shop)
+                                                          .then((value) => {
+                                                        if (value){
+
+                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                            SnackBar(
+                                                              content: Text('변경 내용 저장 완료!'),
+                                                            ),
+                                                          )
+                                                        }
+                                                        else
+                                                          {
+                                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                              SnackBar(
+                                                                content: Text('** 수정 실패 **'),
+                                                              ),
+                                                            )
+                                                          }
+                                                      });
+                                                    },
+                                                    child: Text("변경 내용 저장"))
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisSize: MainAxisSize.max,
                                               crossAxisAlignment:
                                               CrossAxisAlignment.start,
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
                                               children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      shop.shopName,
+                                                Icon(Icons.pin_drop),
+                                                Expanded(
+                                                  child: Text(shop.shopAddress,
                                                       style: TextStyle(
-                                                          fontWeight: FontWeight.bold,
-                                                          fontSize: 20),
-                                                    ),
-                                                    ElevatedButton(
-                                                        onPressed: () {
-                                                          postStore(shop)
-                                                              .then((value) => {
-                                                            if (value){
-
-                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                SnackBar(
-                                                                  content: Text('변경 내용 저장 완료!'),
-                                                                ),
-                                                              )
-                                                            }
-                                                            else
-                                                              {
-                                                                ScaffoldMessenger.of(context).showSnackBar(
-                                                                  SnackBar(
-                                                                    content: Text('** 수정 실패 **'),
-                                                                  ),
-                                                                )
-                                                              }
-                                                          });
-                                                        },
-                                                        child: Text("변경 내용 저장"))
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisSize: MainAxisSize.max,
-                                                  crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                                  children: [
-                                                    Icon(Icons.pin_drop),
-                                                    Expanded(
-                                                      child: Text(shop.shopAddress,
-                                                          style: TextStyle(
-                                                              color: Colors.grey,
-                                                              fontSize: 12)),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Icon(Icons.phone),
-                                                    Expanded(
-                                                        child: Text(shop.shopNumber, style: TextStyle(fontSize: 12))),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      children: [
-                                                        Text("가게 활성화", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold,),
-                                                        ),
-                                                        Switch(
-                                                            value: shop.shopIsOpen,
-                                                            onChanged: (value) {
-                                                              setState(() {
-                                                                shop.shopIsOpen = value;
-                                                                print(shop.shopIsOpen);
-                                                                //print(shop.shopIsOpen);
-                                                              });
-                                                            })
-                                                      ],
-                                                    ),
-                                                    IconButton(
-                                                        onPressed: () {
-                                                          showDialog(context: context,
-                                                              //barrierDismissible: false,
-                                                              builder: (BuildContext context){
-                                                                return AlertDialog(
-                                                                    title: Text('프로필 설정',style: TextStyle(fontWeight: FontWeight.bold),),
-                                                                    content: SingleChildScrollView(
-                                                                      child: Column(
-                                                                        children: [
-                                                                          Padding(
-                                                                            padding: const EdgeInsets.all(8.0),
-                                                                            child: TextField(
-                                                                              controller: _shopNameController,
-                                                                              decoration: InputDecoration(
-                                                                                  labelText: "가게 이름",
-                                                                                  hintText: shop.shopName,
-                                                                                  filled : true,
-                                                                                  fillColor: Colors.white60,
-                                                                                  border: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                                                  )
-                                                                              ),
-                                                                              onSubmitted: (String value) {
-                                                                                // _shopNameController.clear();
-                                                                              },
-                                                                            ),
-                                                                          ),
-                                                                          Padding(
-                                                                            padding: const EdgeInsets.all(8.0),
-                                                                            child: TextField(
-                                                                              controller: _shopNumberController,
-                                                                              decoration: InputDecoration(
-                                                                                  labelText: "전화번호",
-                                                                                  hintText: shop.shopNumber,
-                                                                                  filled : true,
-                                                                                  fillColor: Colors.white60,
-                                                                                  border: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                                                  )
-                                                                              ),
-                                                                              onSubmitted: (String value) {
-                                                                                // _shopNumberController.clear();
-                                                                              },
-                                                                            ),
-                                                                          ),
-                                                                          Padding(
-                                                                            padding: const EdgeInsets.all(8.0),
-                                                                            child: TextField(
-                                                                              readOnly: true,
-                                                                              controller: _shopAddressController,
-                                                                              decoration: InputDecoration(
-                                                                                  labelText: "주소",
-                                                                                  hintText: shop.shopAddress,
-                                                                                  filled : true,
-                                                                                  fillColor: Colors.white60,
-                                                                                  border: OutlineInputBorder(
-                                                                                    borderRadius: BorderRadius.all(Radius.circular(10)),
-                                                                                  )
-                                                                              ),
-                                                                              onSubmitted: (String value) {
-                                                                                // _shopNumberController.clear();
-                                                                              },
-                                                                            ),
-                                                                          ),
-                                                                        ],
-                                                                      ),
-                                                                    ),
-                                                                    actions :[
-                                                                      TextButton(
-                                                                        onPressed: () async {
-                                                                          await Navigator.push(context,
-                                                                              MaterialPageRoute(
-                                                                                  builder: (_)=>KpostalView(
-                                                                                    useLocalServer: true,
-                                                                                    localPort: 8080,
-                                                                                    kakaoKey: '9dffb1243d85c0a676664e8098149340',
-                                                                                    callback: (Kpostal result){
-                                                                                      setState(() {
-                                                                                        print(result);
-                                                                                        addressTmp = result.address;
-                                                                                        lngTmp = result.kakaoLongitude as double;
-                                                                                        latTmp = result.kakaoLatitude as double;
-                                                                                      });
-                                                                                    },
-                                                                                  )));
-                                                                        },
-                                                                        style: ButtonStyle(
-                                                                          backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-                                                                        ),
-                                                                        child: Text(
-                                                                          '주소 검색',
-                                                                          style: TextStyle(color: Colors.white60),
-                                                                        ),
-                                                                      ),
-                                                                      ElevatedButton(onPressed: (){
-                                                                        if(_shopNameController.text != ''){
-                                                                          shop.shopName = _shopNameController.text;
-                                                                        }
-                                                                        if(_shopNumberController.text != ''){
-                                                                          shop.shopNumber = _shopNumberController.text;
-                                                                        }
-                                                                        if(addressTmp != ''){
-                                                                          shop.shopAddress = addressTmp;
-                                                                          addressTmp = '';
-                                                                          shop.shopLocation[0] = lngTmp;
-                                                                          shop.shopLocation[1] = latTmp;
-                                                                          lngTmp = latTmp = 0;
-                                                                        }
-                                                                        postStore(shop)
-                                                                            .then((value) => {
-                                                                          if (value){
-                                                                            setState((){
-                                                                              shop.shopName = shop.shopName;
-                                                                              shop.shopNumber = shop.shopNumber;
-
-                                                                            }),
-                                                                            ScaffoldMessenger.of(context).showSnackBar(
-                                                                              SnackBar(
-                                                                                content: Text('가게 정보 수정 완료!'),
-                                                                              ),
-                                                                            )
-                                                                          }
-                                                                          else
-                                                                            {
-                                                                              ScaffoldMessenger.of(context).showSnackBar(
-                                                                                SnackBar(
-                                                                                  content: Text('** 수정 실패 **'),
-                                                                                ),
-                                                                              )
-                                                                            }
-                                                                        });
-                                                                        _handleSubmitted();
-                                                                        Navigator.of(context).pop();
-                                                                      },
-                                                                          child: Text('저장')
-                                                                      ),
-                                                                      ElevatedButton(onPressed: (){
-                                                                        _handleSubmitted();
-                                                                        Navigator.of(context).pop();
-                                                                      },
-                                                                          child: Text('닫기'),
-                                                                          style: ElevatedButton.styleFrom(
-                                                                            primary: Colors.red,
-                                                                            onPrimary: Colors.black,
-                                                                          )
-                                                                      )
-                                                                    ]
-                                                                );
-                                                              }
-                                                          );
-                                                        },
-                                                        icon: Icon(Icons.settings))
-                                                  ],
+                                                          color: Colors.grey,
+                                                          fontSize: 12)),
                                                 ),
                                               ],
                                             ),
-                                          )),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Expanded(
-                          flex: 6,
-                          child: Row(
-                            children: [
-                              FutureBuilder<Store>(
-                                  future: store,
-                                  builder:
-                                      (BuildContext context, AsyncSnapshot snapshot) {
+                                            Row(
+                                              children: [
+                                                Icon(Icons.phone),
+                                                Expanded(
+                                                    child: Text(shop.shopNumber, style: TextStyle(fontSize: 12))),
+                                              ],
+                                            ),
+                                            Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    Text("가게 활성화", style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold,),
+                                                    ),
+                                                    Switch(
+                                                        value: shop.shopIsOpen,
+                                                        onChanged: (value) {
+                                                          setState(() {
+                                                            shop.shopIsOpen = value;
+                                                            print(shop.shopIsOpen);
+                                                            //print(shop.shopIsOpen);
+                                                          });
+                                                        })
+                                                  ],
+                                                ),
+                                                IconButton(
+                                                    onPressed: () {
+                                                      showDialog(context: context,
+                                                          //barrierDismissible: false,
+                                                          builder: (BuildContext context){
+                                                            return AlertDialog(
+                                                                title: Text('프로필 설정',style: TextStyle(fontWeight: FontWeight.bold),),
+                                                                content: SingleChildScrollView(
+                                                                  child: Column(
+                                                                    children: [
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.all(8.0),
+                                                                        child: TextField(
+                                                                          controller: _shopNameController,
+                                                                          decoration: InputDecoration(
+                                                                              labelText: "가게 이름",
+                                                                              hintText: shop.shopName,
+                                                                              filled : true,
+                                                                              fillColor: Colors.white60,
+                                                                              border: OutlineInputBorder(
+                                                                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                                              )
+                                                                          ),
+                                                                          onSubmitted: (String value) {
+                                                                            // _shopNameController.clear();
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.all(8.0),
+                                                                        child: TextField(
+                                                                          controller: _shopNumberController,
+                                                                          decoration: InputDecoration(
+                                                                              labelText: "전화번호",
+                                                                              hintText: shop.shopNumber,
+                                                                              filled : true,
+                                                                              fillColor: Colors.white60,
+                                                                              border: OutlineInputBorder(
+                                                                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                                              )
+                                                                          ),
+                                                                          onSubmitted: (String value) {
+                                                                            // _shopNumberController.clear();
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                      Padding(
+                                                                        padding: const EdgeInsets.all(8.0),
+                                                                        child: TextField(
+                                                                          readOnly: true,
+                                                                          controller: _shopAddressController,
+                                                                          decoration: InputDecoration(
+                                                                              labelText: "주소",
+                                                                              hintText: shop.shopAddress,
+                                                                              filled : true,
+                                                                              fillColor: Colors.white60,
+                                                                              border: OutlineInputBorder(
+                                                                                borderRadius: BorderRadius.all(Radius.circular(10)),
+                                                                              )
+                                                                          ),
+                                                                          onSubmitted: (String value) {
+                                                                            // _shopNumberController.clear();
+                                                                          },
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                                actions :[
+                                                                  TextButton(
+                                                                    onPressed: () async {
+                                                                      await Navigator.push(context,
+                                                                          MaterialPageRoute(
+                                                                              builder: (_)=>KpostalView(
+                                                                                useLocalServer: true,
+                                                                                localPort: 8080,
+                                                                                kakaoKey: '9dffb1243d85c0a676664e8098149340',
+                                                                                callback: (Kpostal result){
+                                                                                  setState(() {
+                                                                                    print(result);
+                                                                                    addressTmp = result.address;
+                                                                                    lngTmp = result.kakaoLongitude as double;
+                                                                                    latTmp = result.kakaoLatitude as double;
+                                                                                  });
+                                                                                },
+                                                                              )));
+                                                                    },
+                                                                    style: ButtonStyle(
+                                                                      backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                                                                    ),
+                                                                    child: Text(
+                                                                      '주소 검색',
+                                                                      style: TextStyle(color: Colors.white60),
+                                                                    ),
+                                                                  ),
+                                                                  ElevatedButton(onPressed: (){
+                                                                    if(_shopNameController.text != ''){
+                                                                      shop.shopName = _shopNameController.text;
+                                                                    }
+                                                                    if(_shopNumberController.text != ''){
+                                                                      shop.shopNumber = _shopNumberController.text;
+                                                                    }
+                                                                    if(addressTmp != ''){
+                                                                      shop.shopAddress = addressTmp;
+                                                                      addressTmp = '';
+                                                                      shop.shopLocation[0] = lngTmp;
+                                                                      shop.shopLocation[1] = latTmp;
+                                                                      lngTmp = latTmp = 0;
+                                                                    }
+                                                                    postStore(shop)
+                                                                        .then((value) => {
+                                                                      if (value){
+                                                                        setState((){
+                                                                          shop.shopName = shop.shopName;
+                                                                          shop.shopNumber = shop.shopNumber;
 
-                                      return Expanded(
-                                        child: ListView.separated(
-                                          padding: const EdgeInsets.all(5),
-                                          itemCount: trashName.length,
-                                          itemBuilder:
-                                              (BuildContext context, int idx) {
-                                            return Container(
-                                              padding: const EdgeInsets.all(5),
-                                              decoration: BoxDecoration(
-                                                borderRadius:
-                                                BorderRadius.circular(50),
-                                                //border: Border.all(color: Colors.lightGreen, width: 3),
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                    color:
-                                                    Colors.grey.withOpacity(0.5),
-                                                    spreadRadius: 5,
-                                                    blurRadius: 7,
-                                                    offset: Offset(0, 3),
-                                                  )
-                                                ],
-                                                color: Colors.white,
-                                              ),
-                                              height: 50,
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                MainAxisAlignment.spaceAround,
-                                                children: [
-                                                  Text(
-                                                    shop.trashName[idx],
-                                                    style: TextStyle(
-                                                        fontWeight: FontWeight.bold),
-                                                  ),
-                                                  Switch(
-                                                      activeColor: Colors.blueAccent,
-                                                      value: shop.trashFlag[idx],
-                                                      onChanged: (value) {
-                                                        setState(() {
-                                                          shop.trashFlag[idx] = value;
-                                                        });
-                                                      })
-                                                ],
-                                              ),
-                                            );
-                                          },
-                                          separatorBuilder:
-                                              (BuildContext context, int idx) =>
-                                              Divider(
-                                                height: 10.0,
-                                                color: Colors.white,
-                                              ),
+                                                                        }),
+                                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                                          SnackBar(
+                                                                            content: Text('가게 정보 수정 완료!'),
+                                                                          ),
+                                                                        )
+                                                                      }
+                                                                      else
+                                                                        {
+                                                                          ScaffoldMessenger.of(context).showSnackBar(
+                                                                            SnackBar(
+                                                                              content: Text('** 수정 실패 **'),
+                                                                            ),
+                                                                          )
+                                                                        }
+                                                                    });
+                                                                    _handleSubmitted();
+                                                                    Navigator.of(context).pop();
+                                                                  },
+                                                                      child: Text('저장')
+                                                                  ),
+                                                                  ElevatedButton(onPressed: (){
+                                                                    _handleSubmitted();
+                                                                    Navigator.of(context).pop();
+                                                                  },
+                                                                      child: Text('닫기'),
+                                                                      style: ElevatedButton.styleFrom(
+                                                                        primary: Colors.red,
+                                                                        onPrimary: Colors.black,
+                                                                      )
+                                                                  )
+                                                                ]
+                                                            );
+                                                          }
+                                                      );
+                                                    },
+                                                    icon: Icon(Icons.settings))
+                                              ],
+                                            ),
+                                          ],
+                                        ),
+                                      )),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      flex: 6,
+                      child: Row(
+                        children: [
+                          FutureBuilder<Store>(
+                              future: store,
+                              builder:
+                                  (BuildContext context, AsyncSnapshot snapshot) {
+
+                                return Expanded(
+                                  child: ListView.separated(
+                                    padding: const EdgeInsets.all(5),
+                                    itemCount: trashName.length,
+                                    itemBuilder:
+                                        (BuildContext context, int idx) {
+                                      return Container(
+                                        padding: const EdgeInsets.all(5),
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                          BorderRadius.circular(50),
+                                          //border: Border.all(color: Colors.lightGreen, width: 3),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                              Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 5,
+                                              blurRadius: 7,
+                                              offset: Offset(0, 3),
+                                            )
+                                          ],
+                                          color: Colors.white,
+                                        ),
+                                        height: 50,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                          children: [
+                                            Text(
+                                              shop.trashName[idx],
+                                              style: TextStyle(
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                            Switch(
+                                                activeColor: Colors.amber,
+                                                value: shop.trashFlag[idx],
+                                                onChanged: (value) {
+                                                  setState(() {
+                                                    shop.trashFlag[idx] = value;
+                                                  });
+                                                })
+                                          ],
                                         ),
                                       );
+                                    },
+                                    separatorBuilder:
+                                        (BuildContext context, int idx) =>
+                                        Divider(
+                                          height: 10.0,
+                                          color: Colors.white,
+                                        ),
+                                  ),
+                                );
 
-                                  }),
-                            ],
-                          ),
-                        ),
-                      ],
+                              }),
+                        ],
+                      ),
                     ),
-                  );
-                }
-            )));
+                  ],
+                ),
+              );
+            }
+        ));
   }
 }
