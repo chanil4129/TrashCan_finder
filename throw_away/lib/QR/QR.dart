@@ -4,7 +4,6 @@ import 'package:qrscan/qrscan.dart' as scanner;
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart' as url_launcher;
 import 'package:permission_handler/permission_handler.dart';
-import 'package:app_settings/app_settings.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -315,12 +314,12 @@ class _QRCheckerState extends State<QRChecker> {
                         actions: <Widget>[
                           TextButton(
                             onPressed: () {
-                              if (updateShopPoint() == true) {
+                              updateShopPoint();
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => MyHomePage()));
-                              }
+
                             },
                             child: Text('제출'),
                           ),
@@ -370,11 +369,11 @@ class _QRCheckerState extends State<QRChecker> {
     print('Point is' + point.toString());
 
     final url = Uri.parse(
-        'http://52.79.202.39?REQ=post_PUT_ROOT_INFO&PHONE_NUM=' +
+        '''http://52.79.202.39?REQ=post_PUT_ROOT_INFO&PHONE_NUM=''' +
             widget.mCode.toString() +
-            '&CATEGORY=SHOP&JSON_UPDATE={“SHOP_POINT”:' +
-            point.toString() +
-            '}');
+            '''&CATEGORY=SHOP&JSON_UPDATE={"SHOP_POINT":''' +
+            '''${point}''' +
+            '''}''');
 
     print('http://52.79.202.39?REQ=post_PUT_ROOT_INFO&PHONE_NUM=' +
         '01011111111' +
