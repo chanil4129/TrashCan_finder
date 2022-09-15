@@ -23,17 +23,17 @@ class _QR_ViewState extends State<QR_View> {
   Widget build(BuildContext context) {
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            _scan();
-            },
-          tooltip: 'scan',
-          child: const Icon(Icons.camera_alt),
-        )
-    );
+      onPressed: () {
+        _scan();
+      },
+      tooltip: 'scan',
+      child: const Icon(Icons.camera_alt),
+    ));
   }
 
   Future _scan() async {
     String? barcode = await scanner.scan();
+    getPermission();
 
     if (barcode != null) {
       setState(() => _qrString = barcode);
@@ -42,6 +42,21 @@ class _QR_ViewState extends State<QR_View> {
           MaterialPageRoute(
               builder: ((context) => QRChecker(mCode: _qrString))));
     }
+  }
+
+  getPermission() async {
+    var status = await Permission.camera.status;
+    if (status.isGranted) {
+    } else if (status.isDenied) {
+      Permission.camera.request();
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getPermission();
   }
 }
 
