@@ -327,6 +327,16 @@ class _ShopSignUpState extends State<ShopSignUp> {
               ),
             ),
             Padding(
+              padding: EdgeInsets.fromLTRB(10, 50, 10, 10),
+              child: Text(
+                '가게번호',
+                style: TextStyle(
+                    fontSize: 36,
+                    fontWeight: FontWeight.w200,
+                    fontFamily: "Roboto"
+                ),),
+            ),
+            Padding(
               padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
               child: TextField(
                 controller: _ShopNumber,
