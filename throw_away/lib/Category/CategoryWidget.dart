@@ -35,9 +35,13 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'General',
                           onPressed: () {
-                            if (MemberInfo.mislogin) {
+                            if (MemberInfo.mislogin&&MemberInfo.Category!='SHOP') {
                               this.ProgramAccessShopData("GENERAL");
-                            } else {
+                            }
+                            else if(MemberInfo.Category=='SHOP'){
+                              ShopUserButton(context);
+                            }
+                            else {
                               DialogButton(context);
                             }
                           },
@@ -53,9 +57,13 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'pet',
                           onPressed: () {
-                            if (MemberInfo.mislogin) {
+                            if (MemberInfo.mislogin&&MemberInfo.Category!='SHOP') {
                               this.ProgramAccessShopData("PET");
-                            } else {
+                            }
+                            else if(MemberInfo.Category=='SHOP'){
+                              ShopUserButton(context);
+                            }
+                            else {
                               DialogButton(context);
                             }
                           },
@@ -70,9 +78,13 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'cans',
                           onPressed: () {
-                            if (MemberInfo.mislogin) {
+                            if (MemberInfo.mislogin&&MemberInfo.Category!='SHOP') {
                               this.ProgramAccessShopData("CANS");
-                            } else {
+                            }
+                            else if(MemberInfo.Category=='SHOP'){
+                              ShopUserButton(context);
+                            }
+                            else {
                               DialogButton(context);
                             }
                           },
@@ -87,9 +99,13 @@ class _CategoryItemState extends State<Category> {
                         child: FloatingActionButton.extended(
                           heroTag: 'paper',
                           onPressed: () {
-                            if (MemberInfo.mislogin) {
+                            if (MemberInfo.mislogin&&MemberInfo.Category!='SHOP') {
                               this.ProgramAccessShopData("PAPER");
-                            } else {
+                            }
+                            else if(MemberInfo.Category=='SHOP'){
+                              ShopUserButton(context);
+                            }
+                            else {
                               DialogButton(context);
                             }
                           },
@@ -141,10 +157,10 @@ class _CategoryItemState extends State<Category> {
       String current_location = "";
       if (TestMode) {
         current_location =
-            '''{"LNG":''' + '37.557' + ''',"LAT":''' + '126.92' + '''}''';
+            '''{"LNG":''' + '126.9596072' + ''',"LAT":''' + '37.49461708' + '''}''';
 
-        currentUser.lat = 37.557;
-        currentUser.lng = 126.92;
+        currentUser.lat = 37.49461708;
+        currentUser.lng = 126.9596072;
       } else {
         ///다시 살려야됨
         current_location = '''{"LNG":''' +
@@ -178,7 +194,7 @@ class _CategoryItemState extends State<Category> {
         _text = utf8.decode(response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
         final List<U_Store> parsedResponse =
-        dataObjsJson.map((dataJson) => U_Store.fromJson(dataJson)).toList();
+            dataObjsJson.map((dataJson) => U_Store.fromJson(dataJson)).toList();
         _datas.clear();
         _datas.addAll(parsedResponse);
         shopes = _datas;
@@ -188,23 +204,21 @@ class _CategoryItemState extends State<Category> {
       }
 
       ///가게 랭킹
-      if(_datas.length>0){
+      if (_datas.length > 0) {
         Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => MarkerMapPage(),
             ));
+      } else {
+        NoneCountShope(context);
       }
-      else{
-        NoneCountShope;
-      }
-
 
       ///여기까지
 
     } catch (e) {
       throw Exception("정보 가져오기 실패");
-      //NoneCountShope;
+      NoneCountShope(context);
     }
 
     ///여기까지
@@ -245,11 +259,48 @@ class _CategoryItemState extends State<Category> {
               ),
             ],
           );
-        }
-    );
+        });
   }
 
-  void NoneCountShope(BuildContext context){
+  void ShopUserButton(BuildContext context) {
+    showDialog<String>(
+        context: context,
+        //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            // RoundedRectangleBorder - Dialog 화면 모서리 둥글게 조절
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0)),
+            //Dialog Main Title
+            title: Column(
+              children: <Widget>[
+                new Text("탐색 중지"),
+              ],
+            ),
+            //
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  "가게용 회원은 이용하실 수 없습니다.",
+                ),
+              ],
+            ),
+            actions: <Widget>[
+              new ElevatedButton(
+                child: new Text("확인"),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void NoneCountShope(BuildContext context) {
     showDialog<String>(
         context: context,
         //barrierDismissible - Dialog를 제외한 다른 화면 터치 x
@@ -284,7 +335,6 @@ class _CategoryItemState extends State<Category> {
               ),
             ],
           );
-        }
-    );
+        });
   }
 }

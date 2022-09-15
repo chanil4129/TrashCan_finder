@@ -6,6 +6,7 @@ import 'package:naver_map_plugin/naver_map_plugin.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:throw_away_main/data/Store_data.dart';
+import 'package:throw_away_main/QR/QR.dart';
 
 class MarkerMapPage extends StatefulWidget {
   @override
@@ -30,9 +31,6 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
         body: Column(
           children: <Widget>[
             _naverMap(),
-            // Expanded(
-            //   child: _Rank_List(),
-            // )
           ],
         ),
       ),
@@ -52,6 +50,18 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
             markers: markersData(),
             mapType: _mapType,
           ),
+          Positioned(
+            child: Container(
+              color: Colors.transparent,
+              width: 100,
+              height: 100,
+              child: QR_View(),
+              padding: const EdgeInsets.all(8),
+              margin: const EdgeInsets.all(8),
+            ),
+            bottom: 0,
+            right: 0,
+          )
         ],
       ),
     );
@@ -59,20 +69,21 @@ class _MarkerMapPageState extends State<MarkerMapPage> {
 
   List<Marker> markersData() {
     try {
-      markerstore.forEach((store) {
-        _markers.add(Marker(
-            markerId: store.shopAddress,
-            position: LatLng(store.shopLocation.lat, store.shopLocation.lng),
-            captionText: store.shopIsOpen ? store.shopName : "영업준비중",
-            captionColor: Colors.indigo,
-            captionTextSize: 15.0,
-            alpha: 0.8,
-            captionOffset: 30,
-            anchor: AnchorPoint(0.5, 1),
-            width: 20,
-            height: 30,
-            onMarkerTab: _onMarkerTap));
-      });
+        markerstore.forEach((store) {
+          _markers.add(Marker(
+              markerId: store.shopAddress,
+              position: LatLng(store.shopLocation.lat, store.shopLocation.lng),
+              captionText: store.shopIsOpen ? store.shopName : "영업준비중",
+              captionColor: Colors.indigo,
+              captionTextSize: 15.0,
+              alpha: 0.8,
+              captionOffset: 30,
+              anchor: AnchorPoint(0.5, 1),
+              width: 20,
+              height: 30,
+              onMarkerTab: _onMarkerTap));
+        });
+        return _markers;
     } catch (e) {
       throw Exception("마커 업데이트 실패");
     }

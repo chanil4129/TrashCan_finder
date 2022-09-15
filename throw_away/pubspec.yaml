@@ -42,6 +42,11 @@ dependencies:
   geolocator: ^9.0.1
   kpostal: ^0.5.1
   url_launcher: ^6.1.5
+  image_picker: ^0.8.5+3
+  qr_flutter: ^4.0.0
+  qrscan: ^0.3.3
+  app_settings: ^4.1.8
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

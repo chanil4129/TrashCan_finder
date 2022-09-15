@@ -4,12 +4,12 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 
-
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:location/location.dart';
+import 'package:throw_away_main/QR/QR.dart';
 
 import 'package:throw_away_main/main.dart';
 import 'package:throw_away_main/sign_up/signup_main.dart';
@@ -17,6 +17,7 @@ import 'package:throw_away_main/log_in/login_main.dart';
 import 'package:throw_away_main/shop/shop.dart';
 import 'package:throw_away_main/data/login_data.dart';
 import 'package:throw_away_main/data/Store_data.dart';
+import 'package:qr/qr.dart';
 
 class ClientDrawer extends StatefulWidget {
   const ClientDrawer({Key? key}) : super(key: key);
@@ -30,7 +31,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    if (MemberInfo.mislogin&&MemberInfo.Category=='SHOP') {
+    if (MemberInfo.mislogin && MemberInfo.Category == 'SHOP') {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -47,8 +48,9 @@ class _ClientDrawerState extends State<ClientDrawer> {
                 Navigator.pop(context);
                 Navigator.push(
                     context,
-                    CupertinoPageRoute(builder: (context)=>Admin(shopAux : MemberInfo.PhoneNum))
-                );
+                    CupertinoPageRoute(
+                        builder: (context) =>
+                            Admin(shopAux: MemberInfo.PhoneNum)));
               },
             ),
             ListTile(
@@ -60,16 +62,21 @@ class _ClientDrawerState extends State<ClientDrawer> {
             ),
             ListTile(
               title: Text('월간 순위(5순위)'),
-              onTap:(){
+              onTap: () {
                 Rank();
-              }
-              ,
-            )
+              },
+            ),
+            ListTile(
+              title: Text('QR 코드 생성'),
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: ((context) => QR_InputText())));
+              },
+            ),
           ],
         ),
       );
-    }
-    else if(MemberInfo.mislogin&&MemberInfo.Category=='USER') {
+    } else if (MemberInfo.mislogin && MemberInfo.Category == 'USER') {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -81,6 +88,12 @@ class _ClientDrawerState extends State<ClientDrawer> {
               ),
             ),
             ListTile(
+              title: Text('월간 순위(5순위)'),
+              onTap: () {
+                Rank();
+              },
+            ),
+            ListTile(
               title: Text('로그아웃'),
               onTap: () {
                 Navigator.pop(context);
@@ -90,8 +103,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
           ],
         ),
       );
-    }
-    else {
+    } else {
       return Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -108,18 +120,18 @@ class _ClientDrawerState extends State<ClientDrawer> {
                 Navigator.pop(context);
                 Navigator.push(
                     context,
-                    CupertinoPageRoute(builder: (context)=>_myHomePage=Login(title: 'title',login_onSubmit:()=> login_onSubmit(context)))
-                );
+                    CupertinoPageRoute(
+                        builder: (context) => _myHomePage = Login(
+                            title: 'title',
+                            login_onSubmit: () => login_onSubmit(context))));
               },
             ),
             ListTile(
               title: Text('회원가입'),
               onTap: () {
                 Navigator.pop(context);
-                Navigator.push(
-                    context,
-                    CupertinoPageRoute(builder: (context)=>signUp())
-                );
+                Navigator.push(context,
+                    CupertinoPageRoute(builder: (context) => signUp()));
               },
             )
           ],
@@ -128,55 +140,55 @@ class _ClientDrawerState extends State<ClientDrawer> {
     }
   }
 
-  void login_onSubmit(BuildContext context){
-    Future<bool> _future=isLogin();
+  void login_onSubmit(BuildContext context) {
+    Future<bool> _future = isLogin();
 
-    _future.then((val){
-      MemberInfo.UserID=_myHomePage.userid;
-      Navigator.pop(context,true);
+    _future.then((val) {
+      MemberInfo.UserID = _myHomePage.userid;
+      Navigator.pop(context, true);
       showToast('로그인 성공');
-      MemberInfo.mislogin=true;
+      MemberInfo.mislogin = true;
       runApp(const MyApp());
-
-    }).catchError((error){
+    }).catchError((error) {
       showToast('로그인 실패');
     });
   }
 
-  void logout() async{
+  void logout() async {
     // ?REQ=api_LOGOUT
-    String _UriInfo='http://52.79.202.39/?REQ=api_LOGOUT';
-    final url=Uri.parse(_UriInfo);
+    String _UriInfo = 'http://52.79.202.39/?REQ=api_LOGOUT';
+    final url = Uri.parse(_UriInfo);
     final response = await http.get(url);
 
     print('isLogin Response status: ${response.statusCode}');
     print('isLogin Response body: ${response.body}');
 
-    MemberInfo.mislogin=false;
-    MemberInfo.UserID='';
-    MemberInfo.Category='';
-    MemberInfo.PhoneNum='';
+    MemberInfo.mislogin = false;
+    MemberInfo.UserID = '';
+    MemberInfo.Category = '';
+    MemberInfo.PhoneNum = '';
 
     showToast('로그아웃 완료');
 
     runApp(const MyApp());
   }
 
-  Future<bool> isLogin() async{
-    String _UriInfo='http://52.79.202.39/?REQ=api_LOGIN&USER_ID=${_myHomePage.userid}&USER_PW=${_myHomePage.userpw}';
-    final url=Uri.parse(_UriInfo);
+  Future<bool> isLogin() async {
+    String _UriInfo =
+        'http://52.79.202.39/?REQ=api_LOGIN&USER_ID=${_myHomePage.userid}&USER_PW=${_myHomePage.userpw}';
+    final url = Uri.parse(_UriInfo);
     final response = await http.get(url);
 
     print('isLogin Response status: ${response.statusCode}');
     print('isLogin Response body: ${response.body}');
     print('jsondecode : ${jsonDecode(response.body)}');
 
-    Map<String,dynamic> parseInfo=jsonDecode(jsonDecode(response.body));
-    MemberInfo.PhoneNum=parseInfo['ID_AUX'];
-    MemberInfo.Category=parseInfo['CATEGORY'];
+    Map<String, dynamic> parseInfo = jsonDecode(jsonDecode(response.body));
+    MemberInfo.PhoneNum = parseInfo['ID_AUX'];
+    MemberInfo.Category = parseInfo['CATEGORY'];
 
-    print('asdfas'+MemberInfo.PhoneNum);
-    print('asdfas'+MemberInfo.Category);
+    print('asdfas' + MemberInfo.PhoneNum);
+    print('asdfas' + MemberInfo.Category);
 
     // String _UriInfo2='http://52.79.202.39/?REQ=post_GET_ROOT_INFO&PHONE_NUM=01028282828&CATEGORY=SHOP';
     // final url2=Uri.parse(_UriInfo2);
@@ -184,13 +196,12 @@ class _ClientDrawerState extends State<ClientDrawer> {
     //
     // print('asdfkljsdakf: ${response2.body}');
 
-
-    if(!response.body.contains('ID_MAIN')) throw 'error';
+    if (!response.body.contains('ID_MAIN')) throw 'error';
 
     return true;
   }
 
-  Future<void> Rank() async{
+  Future<void> Rank() async {
     try {
       Location location = new Location();
       shop_ranks = [];
@@ -217,11 +228,14 @@ class _ClientDrawerState extends State<ClientDrawer> {
 
       String current_location = "";
       if (TestMode) {
-        current_location =
-            '''{"LNG":''' + '37.557' + ''',"LAT":''' + '126.92' + '''}''';
+        current_location = '''{"LNG":''' +
+            '126.9596072' +
+            ''',"LAT":''' +
+            '37.49461708' +
+            '''}''';
 
-        currentUser.lat = 37.557;
-        currentUser.lng = 126.92;
+        currentUser.lat = 37.49461708;
+        currentUser.lng = 126.9596072;
       } else {
         ///다시 살려야됨
         current_location = '''{"LNG":''' +
@@ -250,7 +264,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
         _text = utf8.decode(rank_response.bodyBytes);
         var dataObjsJson = jsonDecode(_text) as List;
         final List<U_Store> parsedResponse =
-        dataObjsJson.map((dataJson) => U_Store.fromJson(dataJson)).toList();
+            dataObjsJson.map((dataJson) => U_Store.fromJson(dataJson)).toList();
         _ranks.clear();
         _ranks.addAll(parsedResponse);
         shop_ranks = _ranks;
@@ -259,11 +273,10 @@ class _ClientDrawerState extends State<ClientDrawer> {
         print("hi");
       }
 
-      if(_ranks.length>0){
+      if (_ranks.length > 0) {
         DialogButton(context);
       }
-    }
-    catch(e){
+    } catch (e) {
       throw Exception("hh");
     }
   }
@@ -286,7 +299,20 @@ class _ClientDrawerState extends State<ClientDrawer> {
             ),
             //
             content: Expanded(
-              child: _Rank_List(),
+              child: ListView.separated(
+                padding: const EdgeInsets.all(8),
+                itemCount: shop_ranks.length,
+                itemBuilder: (context, int index) {
+                  return Container(
+                    height: 50,
+                    color: Colors.amber,
+                    child: Center(
+                        child: Text(
+                            '요번달 ${index + 1}등 ${shop_ranks[index].shopName}')),
+                  );
+                },
+                separatorBuilder: (context, int index) => const Divider(),
+              ),
             ),
             actions: <Widget>[
               new ElevatedButton(
@@ -297,12 +323,11 @@ class _ClientDrawerState extends State<ClientDrawer> {
               ),
             ],
           );
-        }
-    );
+        });
   }
 
   _Rank_List() {
-    return ListView(padding: const EdgeInsets.all(5),children: [
+    return ListView(padding: const EdgeInsets.all(5), children: [
       Container(
         height: 50,
         color: Colors.transparent,
@@ -336,4 +361,3 @@ class _ClientDrawerState extends State<ClientDrawer> {
     ]);
   }
 }
-
