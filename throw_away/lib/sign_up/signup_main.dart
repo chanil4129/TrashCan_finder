@@ -230,6 +230,7 @@ class _ShopSignUpState extends State<ShopSignUp> {
   final _ShopPn=TextEditingController();
   final _ShopName=TextEditingController();
   final _ShopAddress=TextEditingController();
+  final _ShopNumber=TextEditingController();
 
   String address = '';
   double lng = 0;
@@ -326,6 +327,15 @@ class _ShopSignUpState extends State<ShopSignUp> {
               ),
             ),
             Padding(
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 10),
+              child: TextField(
+                controller: _ShopNumber,
+                decoration: InputDecoration(
+                  // border: OutlineInputBorder(),
+                    labelText: '가게번호를 입력하세요'),
+              ),
+            ),
+            Padding(
               padding: EdgeInsets.fromLTRB(10, 50, 10, 10),
               child: Text(
                 '가게주소',
@@ -397,7 +407,7 @@ class _ShopSignUpState extends State<ShopSignUp> {
     final url=Uri.parse(_UriInfo);
     final response = await http.get(url);
 
-    String _UriInfoAdd='http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${_ShopPn.text}&CATEGORY=SHOP&JSON_UPDATE={"SHOP_NAME":"${_ShopName.text}","SHOP_ADDRESS":"$address","SHOP_NUMBER":"00000000000","SHOP_IS_OPEN":${false},"SHOP_POINT":${0},"SHOP_LOCATION":{"LNG":$lng,"LAT":$lat},"TRASH_TYPE":{"GENERAL":${false},"PET":${false},"CANS":${false},"PAPER":${false}}}';
+    String _UriInfoAdd='http://52.79.202.39/?REQ=post_PUT_ROOT_INFO&PHONE_NUM=${_ShopPn.text}&CATEGORY=SHOP&JSON_UPDATE={"SHOP_NAME":"${_ShopName.text}","SHOP_ADDRESS":"$address","SHOP_NUMBER":"${_ShopNumber.text}","SHOP_IS_OPEN":${false},"SHOP_POINT":${0},"SHOP_LOCATION":{"LNG":$lng,"LAT":$lat},"TRASH_TYPE":{"GENERAL":${false},"PET":${false},"CANS":${false},"PAPER":${false}}}';
     final urlAdd=Uri.parse(_UriInfoAdd);
     final responseAdd=await http.post(urlAdd);
     print('Response status: ${responseAdd.statusCode}');
