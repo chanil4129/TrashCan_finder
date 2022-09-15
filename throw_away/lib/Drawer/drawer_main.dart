@@ -308,7 +308,7 @@ class _ClientDrawerState extends State<ClientDrawer> {
                     color: Colors.amber,
                     child: Center(
                         child: Text(
-                            '요번달 ${index + 1}등 ${shop_ranks[index].shopName}')),
+                            '요번달 ${index + 1}등 ${shop_ranks[index].shopName}\n포인트 : ${shop_ranks[index].shopPoint}')),
                   );
                 },
                 separatorBuilder: (context, int index) => const Divider(),
